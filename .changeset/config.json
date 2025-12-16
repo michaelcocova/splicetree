@@ -1,0 +1,20 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@2.1.1/schema.json",
+  "changelog": ["@changesets/changelog-github", { "repo": "michaelcocova/splicetree" }],
+  "commit": false,
+  "fixed": [
+    [
+      "@splicetree/core",
+      "@splicetree/plugin-checkable",
+      "@splicetree/plugin-dnd",
+      "@splicetree/plugin-keyboard",
+      "@splicetree/plugin-lazy-load",
+      "@splicetree/plugin-search",
+      "@splicetree/adapter-vue"
+    ]
+  ],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": ["@splicetree/docs"]
+}

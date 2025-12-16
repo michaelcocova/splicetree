@@ -1,0 +1,26 @@
+# Node dependencies
+node_modules
+# Misc
+.DS_Store
+
+# Logs
+*.log
+pnpm-debug.log*
+
+dist
+coverage
+*.local
+
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+auto-imports.d.ts
+components.d.ts
+vite.config.ts.timestamp-*
+
+VERSIONING.md

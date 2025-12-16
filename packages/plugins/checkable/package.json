@@ -1,0 +1,32 @@
+{
+  "name": "@splicetree/plugin-checkable",
+  "type": "module",
+  "version": "0.0.1",
+  "author": {
+    "email": "michael.cocova@gmail.com",
+    "name": "Michael Cocova"
+  },
+  "license": "MIT",
+  "homepage": "https://www.splicetree.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michaelcocova/splicetree"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "tsdown --watch",
+    "build": "tsdown"
+  },
+  "devDependencies": {
+    "@splicetree/core": "workspace:*"
+  }
+}
