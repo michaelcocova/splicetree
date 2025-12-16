@@ -2,5 +2,5 @@
 set -euo pipefail
 
 pnpm build
-pnpm publish -r --filter "@splicetree/*" --filter "!@splicetree/docs"
+pnpm publish -r --filter '@splicetree/*' --filter '!@splicetree/docs'
 
