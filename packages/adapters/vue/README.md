@@ -1,16 +1,16 @@
 # @splicetree/adapter-vue
 
+## 简介
+
+SpliceTree Vue 适配层，将核心 `items()` 适配为 `shallowRef` 响应式数据，并复用核心 API。
+
+提供响应式 `items` 与操作方法，自动监听核心事件刷新视图。
+
 [![version](https://img.shields.io/npm/v/@splicetree/adapter-vue.svg?label=version)](https://www.npmjs.com/package/@splicetree/adapter-vue)
 [![downloads](https://img.shields.io/npm/dm/@splicetree/adapter-vue.svg)](https://npmcharts.com/compare/%40splicetree%2Fadapter-vue?minimal=true)
 [![license](https://img.shields.io/npm/l/@splicetree/adapter-vue.svg)](https://www.npmjs.com/package/@splicetree/adapter-vue)
 [![Website](https://img.shields.io/static/v1?label=Website&message=splicetree.dev&color=blue)](https://www.splicetree.dev)
 [![GitHub](https://img.shields.io/static/v1?label=GitHub&message=splicetree%2Fsplicetree&logo=github)](https://github.com/michaelcocova/splicetree)
-
-提供响应式 `items` 与操作方法，自动监听核心事件刷新视图。
-
-## 简介
-
-SpliceTree Vue 适配层，将核心 `items()` 适配为 `shallowRef` 响应式数据，并复用核心 API。
 
 ## 官方文档
 

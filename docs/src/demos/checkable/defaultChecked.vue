@@ -1,6 +1,6 @@
 <script setup>
-import checkable from '@splicetree/checkable'
 import { useSpliceTree } from '@splicetree/adapter-vue'
+import checkable from '@splicetree/checkable'
 import { CheckSquare, ChevronRight, Square } from 'lucide-vue-next'
 import { cn } from '@/utils/shadcn'
 import { treeData } from '@/utils/tree'
@@ -8,7 +8,7 @@ import { treeData } from '@/utils/tree'
 const { items } = useSpliceTree(treeData, {
   plugins: [checkable],
   defaultExpanded: ['a'],
-  defaultChecked: ['a'],
+  configuration: { checkable: { defaultChecked: ['a'] } },
 })
 </script>
 

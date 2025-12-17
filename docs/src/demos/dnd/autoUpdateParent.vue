@@ -1,13 +1,13 @@
 <script setup>
-import { dnd } from '@splicetree/dnd'
 import { useSpliceTree } from '@splicetree/adapter-vue'
+import { dnd } from '@splicetree/dnd'
 import { ChevronRight } from 'lucide-vue-next'
 import { cn } from '@/utils/shadcn'
 import { treeData } from '@/utils/tree'
 
 const { items, dragProps } = useSpliceTree(treeData, {
   plugins: [dnd],
-  autoUpdateParent: true,
+  configuration: { dnd: { autoUpdateParent: true } },
 })
 </script>
 

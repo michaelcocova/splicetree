@@ -2,16 +2,22 @@ import type { SpliceTreePlugin, SpliceTreePluginContext } from '@splicetree/core
 import '@splicetree/core'
 
 declare module '@splicetree/core' {
-  /**
-   * 选项扩展（Checkable）
-   * - defaultChecked：初始勾选的节点 id 列表
-   */
-  interface UseSpliceTreeOptions {
-    /**
-     * 初始勾选的节点 id 列表
-     * 在初始化时将这些节点设置为已勾选
-     */
-    defaultChecked?: string[]
+  export interface SpliceTreeConfiguration {
+    checkable?: {
+      defaultChecked?: string[]
+      triggerByClick?: boolean
+    }
+  }
+  export interface SpliceTreeEventPayloadMap {
+    'input:node-click': {
+      nodeId: string
+      modifiers: {
+        shift: boolean
+        ctrl: boolean
+        meta: boolean
+        alt: boolean
+      }
+    }
   }
 
   /**
@@ -118,7 +124,11 @@ export const checkable: SpliceTreePlugin = {
    * 勾选/半选插件：支持向下级联与向上计算半选
    */
   setup(ctx: SpliceTreePluginContext) {
-    const { defaultChecked = [] } = ctx.options
+    const cfg = (ctx.options?.configuration?.checkable ?? {}) as {
+      defaultChecked?: string[]
+      triggerByClick?: boolean
+    }
+    const { defaultChecked = [] } = cfg
 
     const checkedKeys = new Set<string>(defaultChecked)
     const indeterminateKeys = new Set<string>()
@@ -207,7 +217,18 @@ export const checkable: SpliceTreePlugin = {
       check(id)
     }
     ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
-    ctx.events.emit({ name: 'checked', keys: Array.from(checkedKeys) } as any)
+    ctx.events.emit({ name: 'checked', keys: Array.from(checkedKeys) })
+
+    const triggerByClick = !!cfg?.triggerByClick
+    if (triggerByClick) {
+      ctx.events.on('input:node-click', (p) => {
+        const nodeId = (p as any).nodeId as string
+        if (!ctx.tree.getNode(nodeId)) {
+          return
+        }
+        toggleCheck(nodeId)
+      })
+    }
 
     return {
       checkedKeys,

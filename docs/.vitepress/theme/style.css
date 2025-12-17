@@ -139,7 +139,7 @@
 }
 
 .VPHome .container {
-  @apply w-full max-w-full gap-8;
+  @apply w-full max-w-[86rem] gap-8;
 }
 
 .VPHomeHero .container {

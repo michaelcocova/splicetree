@@ -14,7 +14,11 @@ import { search } from '@splicetree/search'
 
 const tree = createSpliceTree(data, {
   plugins: [search],
-  matcher: (node, q) => String(node.original.title ?? '').toLowerCase().includes(q.toLowerCase()),
+  configuration: {
+    search: {
+      matcher: (node, q) => String(node.original.title ?? '').toLowerCase().includes(q.toLowerCase()),
+    },
+  },
 })
 
 tree.search('readme')
@@ -32,11 +36,11 @@ tree.search('readme')
 
 ## Api
 
-### Options
+### Configuration
 
-| 选项      | 类型                                               | 默认值                                     | 说明         |
-| --------- | -------------------------------------------------- | ------------------------------------------ | ------------ |
-| `matcher` | `(node: SpliceTreeNode, query: string) => boolean` | `JSON.stringify(original).includes(query)` | 自定义匹配器 |
+| 选项                           | 类型                                               | 默认值                                     | 说明         |
+| ------------------------------ | -------------------------------------------------- | ------------------------------------------ | ------------ |
+| `configuration.search.matcher` | `(node: SpliceTreeNode, query: string) => boolean` | `JSON.stringify(original).includes(query)` | 自定义匹配器 |
 
 ### Events
 

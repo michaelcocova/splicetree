@@ -18,8 +18,9 @@ export function createReactive<T extends object>(target: T, callback: ReactiveCa
           return (v: any) => {
             const existed = obj.has(v)
             const r = obj.add(v)
-            if (!existed)
+            if (!existed) {
               callback({ type: 'ADD', target: obj, newValue: v })
+            }
             return r
           }
         }
@@ -28,15 +29,17 @@ export function createReactive<T extends object>(target: T, callback: ReactiveCa
             const existed = obj.has(v)
             const old = v
             const r = obj.delete(v)
-            if (existed)
+            if (existed) {
               callback({ type: 'DELETE', target: obj, oldValue: old })
+            }
             return r
           }
         }
         if (prop === 'clear') {
           return () => {
-            if (obj.size > 0)
+            if (obj.size > 0) {
               callback({ type: 'CLEAR', target: obj })
+            }
             return obj.clear()
           }
         }
@@ -60,15 +63,17 @@ export function createReactive<T extends object>(target: T, callback: ReactiveCa
             const existed = obj.has(k)
             const old = obj.get(k)
             const r = obj.delete(k)
-            if (existed)
+            if (existed) {
               callback({ type: 'DELETE', target: obj, property: k, oldValue: old })
+            }
             return r
           }
         }
         if (prop === 'clear') {
           return () => {
-            if (obj.size > 0)
+            if (obj.size > 0) {
               callback({ type: 'CLEAR', target: obj })
+            }
             return obj.clear()
           }
         }

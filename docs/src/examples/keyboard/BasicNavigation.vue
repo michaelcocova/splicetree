@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { useSpliceTree } from '@splicetree/adapter-vue'
 import keyboard from '@splicetree/plugin-keyboard'
+import pointer from '@splicetree/plugin-pointer'
+import selectable from '@splicetree/plugin-selectable'
 import { ChevronRight } from 'lucide-vue-next'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { treeData } from '@/utils/data'
 import { cn } from '@/utils/shadcn'
 
-const { items } = useSpliceTree(treeData, {
-  plugins: [keyboard],
-  keyboardTarget: '.basic-navigation',
+const { items, onClick } = useSpliceTree(treeData, {
+  plugins: [keyboard, pointer, selectable],
+  configuration: {
+    keyboard: {
+      target: '.basic-navigation',
+    },
+  },
 })
 </script>
 
@@ -29,9 +35,9 @@ const { items } = useSpliceTree(treeData, {
         :style="{ 'padding-left': `calc(var(--spacing) * 3 * ${item.level})` }"
         :data-id="item.id"
         :class="cn('min-h-8 flex items-center gap-1 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100', {
-          'ring-[1px] ring-primary': item.isActive(),
+          'ring-[1px] ring-primary': item.isSelected(),
         })"
-        @click="item.toggleActive(true)"
+        @click="onClick(item.id, $event)"
       >
         <button
           :class="cn('ml-1 transition-all rounded-full size-5 flex items-center justify-center hover:bg-zinc-200', { 'opacity-0': !item.hasChildren() })"

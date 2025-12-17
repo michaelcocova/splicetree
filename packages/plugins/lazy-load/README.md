@@ -1,12 +1,12 @@
 # @splicetree/plugin-lazy-load
 
+提供懒加载子节点能力，在首次展开时动态加载并追加到树。
+
 [![version](https://img.shields.io/npm/v/@splicetree/plugin-lazy-load.svg?label=version)](https://www.npmjs.com/package/@splicetree/plugin-lazy-load)
 [![downloads](https://img.shields.io/npm/dm/@splicetree/plugin-lazy-load.svg)](https://npmcharts.com/compare/%40splicetree%2Fplugin-lazy-load?minimal=true)
 [![license](https://img.shields.io/npm/l/@splicetree/plugin-lazy-load.svg)](https://www.npmjs.com/package/@splicetree/plugin-lazy-load)
 [![Website](https://img.shields.io/static/v1?label=Website&message=splicetree.dev&color=blue)](https://www.splicetree.dev)
 [![GitHub](https://img.shields.io/static/v1?label=GitHub&message=splicetree%2Fsplicetree&logo=github)](https://github.com/michaelcocova/splicetree)
-
-提供懒加载子节点能力，在首次展开时动态加载并追加到树。
 
 ## 安装
 

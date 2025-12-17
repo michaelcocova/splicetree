@@ -1,12 +1,12 @@
 # @splicetree/plugin-dnd
 
+为树节点提供拖拽移动能力，支持插入到目标之前、之后或作为子节点。
+
 [![version](https://img.shields.io/npm/v/@splicetree/plugin-dnd.svg?label=version)](https://www.npmjs.com/package/@splicetree/plugin-dnd)
 [![downloads](https://img.shields.io/npm/dm/@splicetree/plugin-dnd.svg)](https://npmcharts.com/compare/%40splicetree%2Fplugin-dnd?minimal=true)
 [![license](https://img.shields.io/npm/l/@splicetree/plugin-dnd.svg)](https://www.npmjs.com/package/@splicetree/plugin-dnd)
 [![Website](https://img.shields.io/static/v1?label=Website&message=splicetree.dev&color=blue)](https://www.splicetree.dev)
 [![GitHub](https://img.shields.io/static/v1?label=GitHub&message=splicetree%2Fsplicetree&logo=github)](https://github.com/michaelcocova/splicetree)
-
-为树节点提供拖拽移动能力，支持插入到目标之前、之后或作为子节点。
 
 ## 安装
 

@@ -1,13 +1,14 @@
 # 插件
 
-| 插件 / 适配器                  | 功能               | 文档链接                  |
-| ------------------------------ | ------------------ | ------------------------- |
-| `@splicetree/plugin-checkable` | 勾选能力（含半选） | [查看](plugins/checkable) |
-| `@splicetree/plugin-dnd`       | 拖拽移动节点       | [查看](plugins/dnd)       |
-| `@splicetree/plugin-keyboard`  | 键盘导航           | [查看](plugins/keyboard)  |
-| `@splicetree/plugin-lazy-load` | 懒加载子节点       | [查看](plugins/lazy-load) |
-| `@splicetree/plugin-search`    | 搜索与匹配         | [查看](plugins/search)    |
-| `@splicetree/adapter-vue`      | Vue 3 适配层       | [查看](adapters/vue)      |
+| 插件 / 适配器                   | 功能               | 文档链接                   |
+| ------------------------------- | ------------------ | -------------------------- |
+| `@splicetree/plugin-checkable`  | 勾选能力（含半选） | [查看](plugins/checkable)  |
+| `@splicetree/plugin-dnd`        | 拖拽移动节点       | [查看](plugins/dnd)        |
+| `@splicetree/plugin-keyboard`   | 键盘输入采集       | [查看](plugins/keyboard)   |
+| `@splicetree/plugin-pointer`    | 点击输入采集       | [查看](plugins/pointer)    |
+| `@splicetree/plugin-selectable` | 选择（单/多/范围） | [查看](plugins/selectable) |
+| `@splicetree/plugin-lazy-load`  | 懒加载子节点       | [查看](plugins/lazy-load)  |
+| `@splicetree/plugin-search`     | 搜索与匹配         | [查看](plugins/search)     |
 
 ## 插件开发规范
 
@@ -22,7 +23,7 @@
 - 入口：`src/index.ts`，仅 ESM 输出
 - 默认导出插件常量，同时命名导出以便组合
 
-### 插件接口
+### 插件接口与配置聚合
 
 ```ts
 import type { SpliceTreePlugin, SpliceTreePluginContext } from '@splicetree/core'
@@ -30,24 +31,28 @@ import '@splicetree/core'
 
 declare module '@splicetree/core' {
   interface UseSpliceTreeOptions {
-    // 插件选项扩展
+    /**
+     * 插件配置聚合入口（按插件名分类）
+     * 仅当启用对应插件时，才提供相应的配置键
+     * 例如启用 keyboard+selectable：
+     * configuration: {
+     *   keyboard?: {...},
+     *   selectable?: {...},
+     * }
+     */
+    configuration?: Record<string, any>
   }
-  interface SpliceTreeEventPayloadMap {
-    // 事件扩展：event: payload
-  }
-  interface SpliceTreeInstance {
-    // 实例扩展：方法/数据
-  }
-  interface SpliceTreeNode {
-    // 节点扩展：方法/状态查询
-  }
+  interface SpliceTreeEventPayloadMap { /* 事件扩展：event: payload */ }
+  interface SpliceTreeInstance { /* 实例扩展：方法/数据 */ }
+  interface SpliceTreeNode { /* 节点扩展：方法/状态查询 */ }
 }
 
 export const myPlugin: SpliceTreePlugin = {
   name: 'my-plugin',
   setup(ctx: SpliceTreePluginContext) {
-    // 初始化状态与方法
-    // ctx.tree / ctx.options / ctx.events 可用
+    // 读取分类配置：ctx.options.configuration.<pluginName>
+    const cfg = (ctx.options?.configuration?.myPlugin ?? {}) as Record<string, unknown>
+    // 初始化状态与方法；ctx.tree / ctx.options / ctx.events 可用
     // 需要触发渲染时，派发事件：
     // ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
     return {

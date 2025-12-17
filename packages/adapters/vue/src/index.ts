@@ -1,9 +1,9 @@
 import type { SpliceTreeData, SpliceTreeInstance, SpliceTreeNode, UseSpliceTreeOptions } from '@splicetree/core'
 import type { Ref, ShallowRef, WritableComputedRef } from 'vue'
 import { createSpliceTree } from '@splicetree/core'
-import { nextTick, shallowRef, toValue, watch } from 'vue'
+import { shallowRef, toValue, watch } from 'vue'
 
-export interface UseSpliceTreeReturn<T extends SpliceTreeData = SpliceTreeData> extends ShallowRef<Omit<SpliceTreeInstance<T>, 'items'>> {
+export interface UseSpliceTreeReturn<T extends SpliceTreeData = SpliceTreeData> extends Omit<SpliceTreeInstance<T>, 'items'> {
   items: ShallowRef<SpliceTreeNode<T>[]>
 }
 /**
@@ -25,14 +25,15 @@ export function useSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
     })
     items.value = api.value.items()
   }
+  createTree()
   watch(
     () => toValue(data),
     () => {
       createTree()
     },
-    { deep: true, immediate: true },
+    { deep: true, immediate: false },
   )
-  return { ...api, items }
+  return { ...api.value, items }
 }
 
 export type {

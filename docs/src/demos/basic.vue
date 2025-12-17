@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { useSpliceTree } from '@splicetree/adapter-vue'
-import keyboardNavigation from '@splicetree/plugin-keyboard'
+import keyboard from '@splicetree/plugin-keyboard'
+import pointer from '@splicetree/plugin-pointer'
+import selectable from '@splicetree/plugin-selectable'
 import { ChevronRight } from 'lucide-vue-next'
 import { cn } from '@/utils/shadcn'
 import { treeData } from '@/utils/tree'
 
-const { items, toggleActive, activeId } = useSpliceTree(treeData, {
-  plugins: [keyboardNavigation],
-  defaultActive: '2',
+const api = useSpliceTree(treeData, {
+  plugins: [keyboard, pointer, selectable],
+  configuration: {
+    keyboard: { target: '.keyboard-wrapper' },
+    selectable: { multiple: false, defaultSelected: ['2'] },
+  },
 })
+const { items } = api
 </script>
 
 <template>
@@ -18,9 +24,9 @@ const { items, toggleActive, activeId } = useSpliceTree(treeData, {
         v-for="item in items"
         :key="item.id" :style="{ 'padding-left': `calc(var(--spacing) * 3 * ${item.level})` }"
         :class="cn('min-min-h-8 flex items-center gap-1 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100', {
-          'ring-[1px] ring-primary': activeId === item.id,
+          'ring-[1px] ring-primary': item.isSelected(),
         })"
-        @click="toggleActive(item.id, true)"
+        @click="item.toggleSelect(true)"
       >
         <button
           :class="cn('ml-1 transition-all rounded-full size-5 flex items-center justify-center hover:bg-zinc-200', { 'opacity-0': !item.hasChildren() })"
@@ -34,7 +40,7 @@ const { items, toggleActive, activeId } = useSpliceTree(treeData, {
         </button>
         <label
           :class="cn('px-1 rounded')"
-          @click="toggleActive(item.id, true)"
+          @click="item.toggleSelect(true)"
         >
           {{ item.original.title }}
         </label>
@@ -45,6 +51,6 @@ const { items, toggleActive, activeId } = useSpliceTree(treeData, {
     ↑↓ 选择 · ←→ 展开/收起
   </div>
   <div class="text-xs text-zinc-500 text-center">
-    当前 Active: {{ activeId }}
+    当前 Active: {{ api.activeId }}
   </div>
 </template>

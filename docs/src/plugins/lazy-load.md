@@ -14,10 +14,14 @@ import { lazyLoad } from '@splicetree/lazy-load'
 
 const tree = createSpliceTree(data, {
   plugins: [lazyLoad],
-  loadChildren: async (node) => {
-    const resp = await fetch(`/api/children?parent=${node.id}`)
-    const children = await resp.json()
-    return children
+  configuration: {
+    lazyLoad: {
+      loadChildren: async (node) => {
+        const resp = await fetch(`/api/children?parent=${node.id}`)
+        const children = await resp.json()
+        return children
+      },
+    },
   },
 })
 ```

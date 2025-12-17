@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { SpliceTreeData } from '@splicetree/adapter-vue'
 import { useSpliceTree } from '@splicetree/adapter-vue'
+import checkable from '@splicetree/plugin-checkable'
 import dnd from '@splicetree/plugin-dnd'
 import keyboard from '@splicetree/plugin-keyboard'
-import { ChevronRight } from 'lucide-vue-next'
-import { ref } from 'vue'
+import pointer from '@splicetree/plugin-pointer'
+import selectable from '@splicetree/plugin-selectable'
+import { CheckSquare, ChevronRight, MinusSquare, Square } from 'lucide-vue-next'
+import { onMounted, ref } from 'vue'
 import { cn } from '@/utils/shadcn'
 import { Kbd, KbdGroup } from './ui/kbd'
 
@@ -86,39 +89,69 @@ const treeData = ref<SpliceTreeData[]>([
   { id: 'cantaloupe', title: 'Cantaloupe', parent: 'melon' },
   { id: 'cantaloupe-honey', title: 'Honey Cantaloupe', parent: 'cantaloupe' },
 ])
-const { items, dragProps } = useSpliceTree(treeData, {
-  plugins: [dnd, keyboard],
-  defaultExpanded: ['citrus', 'berries', 'blackberry'],
-  keyboardTarget: '.keyboard-wrap',
+
+const api = useSpliceTree(treeData, {
+  plugins: [dnd, pointer, keyboard, selectable, checkable],
+  configuration: {
+    keyboard: {
+      autoListen: true,
+      target: '.keyboard-wrap',
+    },
+    selectable: {
+      multiple: false,
+    },
+    checkable: {
+      defaultChecked: [],
+      triggerByClick: false,
+    },
+    dnd: {
+      autoExpandOnDrop: true,
+      autoUpdateParent: true,
+    },
+  },
+  defaultExpanded: ['berries', 'citrus'],
+})
+const { items, dragProps, onClick } = api
+const keyboardRoot = ref<HTMLElement | null>(null)
+onMounted(() => {
+  keyboardRoot.value?.focus()
+  const first = items.value?.[0]?.id
+  if (first) {
+    api.activeId = first
+  }
 })
 </script>
 
 <template>
-  <main data-example="tree" class="flex-1 min-h-full flex flex-col w-full rounded-lg divide-y border">
-    <header class="p-3 font-medium">
-      示例
+  <main data-example="tree" class="flex-1 min-h-full flex flex-col w-full rounded-lg divide-y border text-sm">
+    <header class="p-3 font-semibold">
+      交互式树 · 拖拽排序 · 勾选多选 · 键盘导航
     </header>
-    <section class="keyboard-wrap flex-1 flex flex-col gap-1 items-stretch overflow-auto p-2 outline-0 ring-0">
+    <section ref="keyboardRoot" class="keyboard-wrap flex-1 flex flex-col gap-1 items-stretch overflow-auto p-2 outline-0 ring-0">
       <div
         v-for="item in items" :key="item.id"
         :style="{ 'padding-left': `calc(var(--spacing) * 3 * ${item.level})` }"
         v-bind="dragProps"
         :data-id="item.id"
-        :class="cn('min-h-8 flex text-sm items-center gap-1 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100', {
-          'ring-[1px] ring-primary': item.isActive(),
-          '[&>[data-drop=position]]:h-full [&>[data-drop=position]]:w-full [&>[data-drop=position]]:rounded': item.getDropPosition?.() === 0,
-          '[&>[data-drop=position]]:h-0.5 [&>[data-drop=position]]:w-full [&>[data-drop=position]]:top-0': item.getDropPosition?.() === -1,
-          '[&>[data-drop=position]]:h-0.5 [&>[data-drop=position]]:w-full [&>[data-drop=position]]:bottom-0': item.getDropPosition?.() === 1,
+        :class="cn('min-h-8 flex items-center gap-1 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100', {
+          'ring-[1px] ring-primary': item.isSelected(),
         })"
         :drop-position="item.getDropPosition() ?? '-2'"
-        @click="item.toggleActive(true)"
+        @click="onClick(item.id, $event)"
       >
-        <div data-drop="position" class="pointer-events-none absolute top-0 left-0 transition-[width] duration-300 ease-in-out w-full h-0 bg-primary" />
         <button
-          :class="cn('ml-1 transition-all rounded-full size-5 flex items-center justify-center hover:bg-zinc-200', { 'opacity-0': !item.hasChildren() })"
+          :class="cn('transition-all rounded-full size-5 flex items-center justify-center hover:bg-zinc-200', { 'opacity-0': !item.hasChildren() })"
           @click="item.toggleExpand()"
         >
           <ChevronRight :class="cn('size-3.5 transition-transform duration-200', { 'rotate-90': item.isExpanded() })" />
+        </button>
+        <button
+          :class="cn('transition-all rounded size-5 flex items-center justify-center hover:bg-zinc-200')"
+          @click.stop="item.toggleCheck()"
+        >
+          <CheckSquare v-if="item.isChecked?.()" class="size-4 text-primary" />
+          <MinusSquare v-else-if="item.isIndeterminate?.()" class="size-4 text-primary" />
+          <Square v-else class="size-4" />
         </button>
         <label>
           {{ item.original.title }}
@@ -131,19 +164,26 @@ const { items, dragProps } = useSpliceTree(treeData, {
         <div class="size-0.5 bg-zinc-500 rounded-lg" />
         <Kbd>↓ 下一个</Kbd>
         <div class="size-0.5 bg-zinc-500 rounded-lg" />
-        <Kbd>← 收起</Kbd>
+        <Kbd>← 收起/聚焦父级</Kbd>
         <div class="size-0.5 bg-zinc-500 rounded-lg" />
-        <Kbd>→ 展开</Kbd>
+        <Kbd>→ 展开/聚焦子级</Kbd>
       </KbdGroup>
-      <div>拖动节点可以排序，移动</div>
+      <div>拖拽排序：顶部线=前插；底部线=后插；中间高亮=成为子节点</div>
+      <div>选择：点击选中；⌘/Ctrl+点击 多选；Shift+点击 范围选择</div>
+      <div>勾选：点击左侧方块 勾选/取消；半选随子节点状态自动计算</div>
     </div>
   </main>
 </template>
 
 <style lang="css">
-  [data-example='tree'] {
+[data-example='tree'] {
   /* background: linear-gradient(to right, #22c1c3, #fdbb2d); */
-  /* padding: 2px; */
+  background: linear-gradient(oklch(0.62 0.2 276.966) 30%, oklch(0.8 0.1 276.966));
+  padding: 2px;
+}
+[data-example='tree'] > header {
+  background: oklch(0.62 0.2 276.966);
+  color: #fff;
 }
 [data-example='tree'] > * {
   background: #fff;
@@ -165,5 +205,37 @@ const { items, dragProps } = useSpliceTree(treeData, {
 }
 .keyboard-wrap {
   scrollbar-width: none;
+}
+
+div[drop-position][draggable='true'] {
+  position: relative;
+}
+div[drop-position][draggable='true']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  display: none;
+}
+div[draggable='true'][drop-position='-1']::before {
+  top: 0;
+  height: 2px;
+  display: block;
+  background: var(--vp-code-color);
+}
+div[draggable='true'][drop-position='1']::before {
+  bottom: 0;
+  height: 2px;
+  background: var(--vp-code-color);
+  display: block;
+}
+div[draggable='true'][drop-position='0']::before {
+  top: 0;
+  bottom: 0;
+  background: var(--vp-code-color);
+  opacity: 0.15;
+  display: block;
+  border-radius: 4px;
 }
 </style>
