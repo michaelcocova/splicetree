@@ -7,7 +7,7 @@ import { cn } from '@/utils/shadcn'
 
 const { items, dragProps } = useSpliceTree(treeData, {
   plugins: [dnd],
-  autoUpdateParent: false,
+  configuration: { dnd: { autoUpdateParent: false } },
 })
 </script>
 
@@ -19,12 +19,8 @@ const { items, dragProps } = useSpliceTree(treeData, {
         :style="{ 'padding-left': `calc(var(--spacing) * 3 * ${item.level})` }"
         v-bind="dragProps"
         :data-id="item.id"
-        :class="cn('min-h-8 flex items-center gap-1 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100', {
-          '[&>[data-drop=position]]:h-full [&>[data-drop=position]]:w-full [&>[data-drop=position]]:rounded': item.getDropPosition?.() === 0,
-          '[&>[data-drop=position]]:h-0.5 [&>[data-drop=position]]:w-full [&>[data-drop=position]]:top-0': item.getDropPosition?.() === -1,
-          '[&>[data-drop=position]]:h-0.5 [&>[data-drop=position]]:w-full [&>[data-drop=position]]:bottom-0': item.getDropPosition?.() === 1,
-        })"
-        :drop-position="item.getDropPosition() ?? '-2'"
+        :class="cn('min-h-8 flex items-center gap-1 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100')"
+        :drop-position="item.getDropPosition()"
       >
         <div data-drop="position" class="pointer-events-none absolute top-0 left-0 transition-[width] duration-300 ease-in-out w-full h-0 bg-primary" />
         <button
@@ -40,3 +36,37 @@ const { items, dragProps } = useSpliceTree(treeData, {
     </div>
   </div>
 </template>
+
+<style scoped>
+div[drop-position][draggable='true'] {
+  position: relative;
+}
+div[drop-position][draggable='true']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  display: none;
+}
+div[draggable='true'][drop-position='-1']::before {
+  top: 0;
+  height: 2px;
+  display: block;
+  background: var(--vp-code-color);
+}
+div[draggable='true'][drop-position='1']::before {
+  bottom: 0;
+  height: 2px;
+  background: var(--vp-code-color);
+  display: block;
+}
+div[draggable='true'][drop-position='0']::before {
+  top: 0;
+  bottom: 0;
+  background: var(--vp-code-color);
+  opacity: 0.15;
+  display: block;
+  border-radius: 4px;
+}
+</style>

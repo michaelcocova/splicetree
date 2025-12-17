@@ -53,6 +53,8 @@ export default defineConfig({
               { text: 'Checkable', link: '/plugins/checkable' },
               { text: 'DnD', link: '/plugins/dnd' },
               { text: 'Keyboard', link: '/plugins/keyboard' },
+              { text: 'Pointer', link: '/plugins/pointer' },
+              { text: 'Selectable', link: '/plugins/selectable' },
               { text: 'Lazy Load', link: '/plugins/lazy-load' },
               { text: 'Search', link: '/plugins/search' },
               { text: '开发示例', link: '/plugins/example' },

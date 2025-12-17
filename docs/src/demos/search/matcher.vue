@@ -1,6 +1,6 @@
 <script setup>
-import { search } from '@splicetree/search'
 import { useSpliceTree } from '@splicetree/adapter-vue'
+import { search } from '@splicetree/search'
 import { ChevronRight } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { cn } from '@/utils/shadcn'
@@ -9,7 +9,11 @@ import { treeData } from '@/utils/tree'
 const query = ref('')
 const { items, search: runSearch, isMatched } = useSpliceTree(treeData, {
   plugins: [search],
-  matcher: (node, q) => String(node.original.title ?? '').toLowerCase().includes(q.toLowerCase()),
+  configuration: {
+    search: {
+      matcher: (node, q) => String(node.original.title ?? '').toLowerCase().includes(q.toLowerCase()),
+    },
+  },
 })
 
 function onInput(e) {

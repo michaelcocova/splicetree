@@ -1,18 +1,11 @@
-import type { SpliceTreePlugin, SpliceTreePluginContext } from '@splicetree/core'
+import type { SpliceTreeNode, SpliceTreePlugin, SpliceTreePluginContext } from '@splicetree/core'
 import '@splicetree/core'
 
 declare module '@splicetree/core' {
-  /**
-   * 选项扩展（Lazy-Load）
-   * - loadChildren：按需加载指定节点的子节点
-   */
-  interface UseSpliceTreeOptions {
-    /**
-     * 加载指定节点的子节点
-     * 返回子节点数据数组，加载完成后将自动追加到树中
-     * @param node 要加载子节点的目标节点
-     */
-    loadChildren?: (node: SpliceTreeNode<any>) => Promise<any[]>
+  export interface SpliceTreeConfiguration {
+    lazyLoad?: {
+      loadChildren?: (node: SpliceTreeNode<any>) => Promise<any[]>
+    }
   }
 
   /**
@@ -63,7 +56,10 @@ export const lazyLoad: SpliceTreePlugin = {
    * - 通过 loadedKeys 标记已加载节点
    */
   setup(ctx: SpliceTreePluginContext) {
-    const { loadChildren } = ctx.options
+    const cfg = (ctx.options?.configuration?.lazyLoad ?? {}) as {
+      loadChildren?: (node: SpliceTreeNode<any>) => Promise<any[]>
+    }
+    const { loadChildren } = cfg
     const loadedKeys = new Set<string>()
     const isLoaded = (id: string) => loadedKeys.has(id)
 
@@ -105,7 +101,7 @@ export const lazyLoad: SpliceTreePlugin = {
       if (children?.length) {
         ctx.tree.appendChildren(id, children)
         for (const c of children) {
-          const childId = String(Reflect.get(c as any, ctx.tree.options?.keyField ?? 'id'))
+          const childId = String(Reflect.get(c, ctx.tree.options?.keyField ?? 'id'))
           const childNode = ctx.tree.getNode(childId)
           if (childNode) {
             applyLazyOverrides(childNode)
@@ -113,7 +109,7 @@ export const lazyLoad: SpliceTreePlugin = {
         }
       }
       loadedKeys.add(id)
-      ctx.events.emit({ name: 'lazyload', keys: Array.from(loadedKeys) } as any)
+      ctx.events.emit({ name: 'lazyload', keys: Array.from(loadedKeys) })
     }
 
     const origExpand = ctx.tree.expand.bind(ctx.tree)
@@ -127,11 +123,12 @@ export const lazyLoad: SpliceTreePlugin = {
       const list = Array.isArray(ids) ? ids : [ids]
       if (loadChildren) {
         for (const id of list) {
-          if (!isLoaded(id))
+          if (!isLoaded(id)) {
             await load(id)
+          }
         }
       }
-      origExpand(ids as any)
+      origExpand(ids)
     }
     /**
      * 覆盖 toggleExpand：在切换前确保子节点已加载
@@ -141,20 +138,20 @@ export const lazyLoad: SpliceTreePlugin = {
       const list = Array.isArray(ids) ? ids : [ids]
       if (loadChildren) {
         for (const id of list) {
-          if (!isLoaded(id))
+          if (!isLoaded(id)) {
             await load(id)
+          }
         }
       }
-      origToggle(ids as any)
+      origToggle(ids)
     }
 
     return {
       loadedKeys,
       isLoaded,
       load,
-      // 覆盖核心方法以接入懒加载
-      expand: expand as any,
-      toggleExpand: toggleExpand as any,
+      expand,
+      toggleExpand,
     }
   },
   /**
@@ -163,7 +160,7 @@ export const lazyLoad: SpliceTreePlugin = {
    * - hasChildren：未加载时返回 true，已加载后按实际子节点判断
    */
   extendNode(node, ctx) {
-    ;(node as any).isLoaded = () => ctx.tree.isLoaded?.(node.id)
+    node.isLoaded = () => ctx.tree.isLoaded?.(node.id)
     node.hasChildren = () => {
       const loaded = ctx.tree.isLoaded?.(node.id)
       if (!loaded) {

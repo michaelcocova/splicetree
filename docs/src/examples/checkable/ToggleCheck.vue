@@ -37,8 +37,12 @@ const { items } = useSpliceTree(treeData, {
           {{ item.original.title }}
         </label>
         <div class="ml-auto flex items-center gap-2">
-          <button class="text-xs px-2 py-1 border rounded" @click="item.toggleCheck(true)">勾选</button>
-          <button class="text-xs px-2 py-1 border rounded" @click="item.toggleCheck(false)">取消</button>
+          <button class="text-xs px-2 py-1 border rounded" @click="item.toggleCheck(true)">
+            勾选
+          </button>
+          <button class="text-xs px-2 py-1 border rounded" @click="item.toggleCheck(false)">
+            取消
+          </button>
         </div>
       </div>
     </div>

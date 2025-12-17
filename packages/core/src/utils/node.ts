@@ -9,10 +9,14 @@ export function computeVisibleItems<T extends SpliceTreeData>(roots: SpliceTreeN
   const walk = (node: SpliceTreeNode<T>) => {
     result.push(node)
     if (node.isExpanded() && node.hasChildren()) {
-      for (const child of node.getChildren()) walk(child as SpliceTreeNode<T>)
+      for (const child of node.getChildren()) {
+        walk(child as SpliceTreeNode<T>)
+      }
     }
   }
-  for (const root of roots) walk(root)
+  for (const root of roots) {
+    walk(root)
+  }
   return result
 }
 
@@ -25,7 +29,9 @@ export function setLevelRecursively<T extends SpliceTreeData>(
   startLevel?: number,
 ) {
   node.level = startLevel ?? node.level
-  for (const c of childrenCache.get(node.id) ?? []) setLevelRecursively(c, childrenCache, (node.level ?? 0) + 1)
+  for (const c of childrenCache.get(node.id) ?? []) {
+    setLevelRecursively(c, childrenCache, (node.level ?? 0) + 1)
+  }
 }
 
 /**
@@ -53,30 +59,42 @@ export function appendChildren<T extends SpliceTreeData>(
 ) {
   const parent = parentId ? ctx.map.get(parentId) : undefined
   for (const item of children) {
-    const id = String(Reflect.get(item as any, ctx.keyField || 'id'))
-    if (ctx.map.has(id)) continue
+    const id = String(Reflect.get(item, ctx.keyField || 'id'))
+    if (ctx.map.has(id)) {
+      continue
+    }
     const node: SpliceTreeNode<T> = {
       id,
       original: item,
-      level: parent ? (parent as any).level + 1 : 0,
+      level: parent ? parent.level + 1 : 0,
       hasChildren: () => !!ctx.childrenCache.get(id)?.length,
       getParent: () => ctx.parentCache.get(id),
       getChildren: () => ctx.childrenCache.get(id) ?? [],
       isExpanded: () => ctx.expandedKeys.has(id),
       toggleExpand: (expand?: boolean) => {
-        if (expand === undefined) ctx.tree.toggleExpand(id)
-        else if (expand) ctx.tree.expand(id)
-        else ctx.tree.collapse(id)
+        if (expand === undefined) {
+          ctx.tree.toggleExpand(id)
+        } else if (expand) {
+          ctx.tree.expand(id)
+        } else {
+          ctx.tree.collapse(id)
+        }
       },
     }
     ctx.map.set(id, node)
     ctx.childrenCache.set(id, [])
     ctx.parentCache.set(id, parent)
-    if (parent) (ctx.childrenCache.get((parent as any).id)!).push(node)
-    else ctx.roots.push(node)
+    if (parent) {
+      (ctx.childrenCache.get(parent.id)!).push(node)
+    } else {
+      ctx.roots.push(node)
+    }
   }
-  if (parent) setLevelRecursively(parent as any, ctx.childrenCache, (parent as any).level)
-  else ctx.roots.forEach(r => setLevelRecursively(r as any, ctx.childrenCache, 0))
+  if (parent) {
+    setLevelRecursively(parent, ctx.childrenCache, parent.level)
+  } else {
+    ctx.roots.forEach(r => setLevelRecursively(r, ctx.childrenCache, 0))
+  }
   ctx.notify()
 }
 
@@ -91,22 +109,30 @@ export function moveNode<T extends SpliceTreeData>(
   beforeId?: string,
 ) {
   const node = ctx.map.get(id)
-  if (!node) return
+  if (!node) {
+    return
+  }
   const oldParent = ctx.parentCache.get(id)
   const newParent = newParentId ? (ctx.map.get(newParentId)) : undefined
   if (oldParent) {
     const arr = (ctx.childrenCache.get(oldParent.id) ?? [])
     const idx = arr.findIndex(n => n.id === id)
-    if (idx >= 0) arr.splice(idx, 1)
+    if (idx >= 0) {
+      arr.splice(idx, 1)
+    }
   } else {
     const idx = ctx.roots.findIndex(n => n.id === id)
-    if (idx >= 0) ctx.roots.splice(idx, 1)
+    if (idx >= 0) {
+      ctx.roots.splice(idx, 1)
+    }
   }
   ctx.parentCache.set(id, newParent)
   node.level = newParent ? newParent.level + 1 : 0
   if (newParent) {
     const arr = (ctx.childrenCache.get(newParent.id) ?? [])
-    if (!ctx.childrenCache.has(newParent.id)) ctx.childrenCache.set(newParent.id, arr)
+    if (!ctx.childrenCache.has(newParent.id)) {
+      ctx.childrenCache.set(newParent.id, arr)
+    }
     if (beforeId) {
       const idx = arr.findIndex(n => n.id === beforeId)
       if (idx >= 0) {
@@ -127,6 +153,6 @@ export function moveNode<T extends SpliceTreeData>(
   } else {
     ctx.roots.push(node)
   }
-  setLevelRecursively(node as any, ctx.childrenCache, node.level)
+  setLevelRecursively(node, ctx.childrenCache, node.level)
   ctx.notify()
 }

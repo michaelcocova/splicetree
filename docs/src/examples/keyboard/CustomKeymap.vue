@@ -1,21 +1,31 @@
 <script setup lang="ts">
 import { useSpliceTree } from '@splicetree/adapter-vue'
 import keyboard from '@splicetree/plugin-keyboard'
+import pointer from '@splicetree/plugin-pointer'
+import selectable from '@splicetree/plugin-selectable'
 import { ChevronRight } from 'lucide-vue-next'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { treeData } from '@/utils/data'
 import { cn } from '@/utils/shadcn'
 
-const { items } = useSpliceTree(treeData, {
-  plugins: [keyboard],
-  keyboardTarget: '.custom-keymap',
-  keymap: {
-    prev: 'w',
-    next: 's',
-    collapse: 'a',
-    expand: 'd',
+const api = useSpliceTree(treeData, {
+  plugins: [keyboard, pointer, selectable],
+  configuration: {
+    keyboard: {
+      target: '.custom-keymap',
+      keymap: {
+        up: 'w',
+        down: 's',
+        left: 'a',
+        right: 'd',
+      },
+    },
+    selectable: {
+      multiple: true,
+    },
   },
 })
+const { items } = api
 </script>
 
 <template>
@@ -35,9 +45,9 @@ const { items } = useSpliceTree(treeData, {
         :style="{ 'padding-left': `calc(var(--spacing) * 3 * ${item.level})` }"
         :data-id="item.id"
         :class="cn('min-h-8 flex items-center gap-1 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100', {
-          'ring-[1px] ring-primary': item.isActive(),
+          'ring-[1px] ring-primary': item.isSelected(),
         })"
-        @click="item.toggleActive(true)"
+        @click="item.toggleSelect(true)"
       >
         <button
           :class="cn('ml-1 transition-all rounded-full size-5 flex items-center justify-center hover:bg-zinc-200', { 'opacity-0': !item.hasChildren() })"

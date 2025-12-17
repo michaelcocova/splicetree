@@ -1,12 +1,12 @@
 # @splicetree/plugin-search
 
+为树提供搜索匹配能力，可自定义匹配器。
+
 [![version](https://img.shields.io/npm/v/@splicetree/plugin-search.svg?label=version)](https://www.npmjs.com/package/@splicetree/plugin-search)
 [![downloads](https://img.shields.io/npm/dm/@splicetree/plugin-search.svg)](https://npmcharts.com/compare/%40splicetree%2Fplugin-search?minimal=true)
 [![license](https://img.shields.io/npm/l/@splicetree/plugin-search.svg)](https://www.npmjs.com/package/@splicetree/plugin-search)
 [![Website](https://img.shields.io/static/v1?label=Website&message=splicetree.dev&color=blue)](https://www.splicetree.dev)
 [![GitHub](https://img.shields.io/static/v1?label=GitHub&message=splicetree%2Fsplicetree&logo=github)](https://github.com/michaelcocova/splicetree)
-
-为树提供搜索匹配能力，可自定义匹配器。
 
 ## 安装
 

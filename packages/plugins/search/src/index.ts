@@ -1,19 +1,11 @@
-import type { SpliceTreePlugin, SpliceTreePluginContext } from '@splicetree/core'
+import type { SpliceTreeNode, SpliceTreePlugin, SpliceTreePluginContext } from '@splicetree/core'
 import '@splicetree/core'
 
 declare module '@splicetree/core' {
-  /**
-   * 选项扩展（Search）
-   * - matcher：自定义匹配器（默认按 JSON 字符串包含匹配）
-   */
-  interface UseSpliceTreeOptions<T> {
-    /**
-     * 自定义匹配器
-     * 返回 true 表示节点命中查询
-     * @param node 当前遍历节点
-     * @param query 查询串
-     */
-    matcher?: (node: SpliceTreeNode<T>, query: string) => boolean
+  export interface SpliceTreeConfiguration {
+    search?: {
+      matcher?: (node: SpliceTreeNode<any>, query: string) => boolean
+    }
   }
 
   /**
@@ -68,7 +60,10 @@ export const search: SpliceTreePlugin = {
    * - 通过 events 派发 search 事件，携带匹配 keys 与 query
    */
   setup(ctx: SpliceTreePluginContext) {
-    const { matcher } = ctx.options
+    const cfg = (ctx.options?.configuration?.search ?? {}) as {
+      matcher?: (node: SpliceTreeNode<any>, query: string) => boolean
+    }
+    const { matcher } = cfg
     const matchedKeys = new Set<string>()
     const isMatched = (id: string) => matchedKeys.has(id)
 
@@ -92,7 +87,7 @@ export const search: SpliceTreePlugin = {
     const search = (query: string) => {
       matchedKeys.clear()
       if (!query) {
-        ctx.events.emit({ name: 'search', keys: [], query } as any)
+        ctx.events.emit({ name: 'search', keys: [], query })
         return
       }
       const items = ctx.tree.items()
@@ -102,7 +97,7 @@ export const search: SpliceTreePlugin = {
           matchedKeys.add(n.id)
         }
       }
-      ctx.events.emit({ name: 'search', keys: Array.from(matchedKeys), query } as any)
+      ctx.events.emit({ name: 'search', keys: Array.from(matchedKeys), query })
     }
 
     return {
@@ -116,7 +111,7 @@ export const search: SpliceTreePlugin = {
    * - isMatched：当前节点是否匹配当前查询
    */
   extendNode(node, ctx) {
-    ;(node as any).isMatched = () => (ctx.tree as any).isMatched(node.id)
+    node.isMatched = () => ctx.tree.isMatched(node.id)
   },
 }
 

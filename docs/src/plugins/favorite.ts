@@ -7,14 +7,11 @@ import '@splicetree/core'
  * 通过模块扩展补充插件相关类型
  */
 declare module '@splicetree/core' {
-  /**
-   * SpliceTree 配置选项扩展
-   */
-  interface UseSpliceTreeOptions {
-    /** 默认收藏的节点 ID 列表 */
-    favoriteDefault?: string[]
+  interface SpliceTreeConfiguration {
+    favorite?: {
+      defaultFavorite?: string[]
+    }
   }
-
   /**
    * SpliceTree 事件负载扩展
    */
@@ -76,7 +73,7 @@ export const favorite: SpliceTreePlugin = {
    */
   setup(ctx: SpliceTreePluginContext) {
     /** 初始化收藏集合 */
-    const set = new Set<string>(ctx.options.favoriteDefault ?? [])
+    const set = new Set<string>((ctx.options?.configuration?.favorite?.defaultFavorite ?? []) as string[])
 
     /** 派发收藏事件 */
     const emit = () => ctx.events.emit({ name: 'favorite', keys: Array.from(set) })
@@ -99,7 +96,9 @@ export const favorite: SpliceTreePlugin = {
      * @param ids 节点 ID 或 ID 数组
      */
     const favorite = (ids: string | string[]) => {
-      for (const id of toList(ids)) set.add(id)
+      for (const id of toList(ids)) {
+        set.add(id)
+      }
       emit()
     }
 
@@ -108,7 +107,9 @@ export const favorite: SpliceTreePlugin = {
      * @param ids 节点 ID 或 ID 数组
      */
     const unfavorite = (ids: string | string[]) => {
-      for (const id of toList(ids)) set.delete(id)
+      for (const id of toList(ids)) {
+        set.delete(id)
+      }
       emit()
     }
 
@@ -119,11 +120,15 @@ export const favorite: SpliceTreePlugin = {
     const toggleFavorite = (ids: string | string[]) => {
       const add: string[] = []
       const del: string[] = []
-      for (const id of toList(ids)) (set.has(id) ? del : add).push(id)
-      if (add.length)
+      for (const id of toList(ids)) {
+        (set.has(id) ? del : add).push(id)
+      }
+      if (add.length) {
         favorite(add)
-      if (del.length)
+      }
+      if (del.length) {
         unfavorite(del)
+      }
     }
 
     /** 暴露实例 API */
@@ -137,17 +142,19 @@ export const favorite: SpliceTreePlugin = {
    */
   extendNode(node: SpliceTreeNode, ctx: SpliceTreePluginContext) {
     /** 节点提供收藏态查询 */
-    node.isFavorited = () => (ctx.tree as any).isFavorited(node.id)
+    node.isFavorited = () => ctx.tree.isFavorited(node.id)
     /**
      * 节点提供收藏切换
      * @param favorited 如果未传则切换状态，true 表示收藏，false 表示取消收藏
      */
     node.toggleFavorite = (favorited?: boolean) => {
-      if (favorited === undefined)
-        (ctx.tree as any).toggleFavorite(node.id)
-      else if (favorited)
-        (ctx.tree as any).favorite(node.id)
-      else (ctx.tree as any).unfavorite(node.id)
+      if (favorited === undefined) {
+        ctx.tree.toggleFavorite(node.id)
+      } else if (favorited) {
+        ctx.tree.favorite(node.id)
+      } else {
+        ctx.tree.unfavorite(node.id)
+      }
     }
   },
 }

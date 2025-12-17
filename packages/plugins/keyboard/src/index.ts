@@ -1,252 +1,147 @@
 import type { SpliceTreePlugin, SpliceTreePluginContext } from '@splicetree/core'
 import '@splicetree/core'
 
+interface KeyboardKeymap {
+  up?: string
+  down?: string
+  left?: string
+  right?: string
+}
 type KeyboardTargetType = HTMLElement | string | null | undefined
 type KeyboardTarget = KeyboardTargetType | (() => KeyboardTargetType)
-declare module '@splicetree/core' {
-  export interface UseSpliceTreeOptions {
-    /**
-     * 默认激活节点 ID
-     * @default undefined
-     */
-    defaultActive?: string
-    /**
-     * 是否自动监听键盘事件
-     * 开启后，插件会自动监听键盘事件
-     * 关闭后，需要手动调用 `listenKeyboard` 方法监听键盘事件
-     * @default true
-     */
-    autoListenKeyboard?: boolean
-    /**
-     * 键盘导航快捷键
-     * @default { expand: 'ArrowRight', collapse: 'ArrowLeft', next: 'ArrowDown', prev: 'ArrowUp' }
-     */
-    keymap?: {
-      expand?: string
-      collapse?: string
-      next?: string
-      prev?: string
-    }
-    /**
-     * 键盘导航目标元素
-     * @default document.body
-     */
-    keyboardTarget?: KeyboardTarget
-  }
 
-  /**
-   * 实例扩展（Keyboard）
-   * - activeId：当前激活的节点 id
-   * - toggleActive：切换或显式设置某节点的激活态
-   */
-  interface SpliceTreeInstance {
-    /**
-     * 当前激活的节点 id（未激活时为 undefined）
-     */
-    activeId?: string
-    /**
-     * 切换或显式设置某节点的激活态
-     * @param id 节点 id
-     * @param active 不传表示切换；true/false 表示显式设置
-     */
-    toggleActive: (id: string, active?: boolean) => void
-  }
-
-  /**
-   * 节点扩展（Keyboard）
-   * - isActive：当前节点是否激活
-   * - toggleActive：切换当前节点的激活态
-   */
-  interface SpliceTreeNode {
-    /**
-     * 当前节点是否为激活态
-     */
-    isActive: () => boolean
-    /**
-     * 切换当前节点的激活态
-     * @param active 不传表示切换；true/false 表示显式设置
-     */
-    toggleActive: (active?: boolean) => void
-  }
+interface Modifiers {
+  shift: boolean
+  ctrl: boolean
+  meta: boolean
+  alt: boolean
 }
 
-/**
- * 解析键盘监听目标元素
- * 支持传入选择器、元素实例或函数
- */
-function resolveKeyboardTarget(targe?: KeyboardTarget): HTMLElement | null {
-  if (typeof targe === 'string') {
-    return document.querySelector(targe)
+declare module '@splicetree/core' {
+  export interface SpliceTreeConfiguration {
+    keyboard?: {
+      autoListen?: boolean
+      target?: KeyboardTarget
+      keymap?: KeyboardKeymap
+    }
   }
-  if (targe instanceof HTMLElement) {
-    return targe
+  export interface SpliceTreeEventPayloadMap {
+    'input:direction': {
+      direction: 'up' | 'down' | 'left' | 'right'
+      modifiers: Modifiers
+    }
+    'input:node-click': {
+      nodeId: string
+      modifiers: Modifiers
+    }
   }
-  if (typeof targe === 'function') {
-    return resolveKeyboardTarget(targe?.())
+  export interface SpliceTreeInstance {
+    emitNodeClick: (nodeId: string, e: MouseEvent) => void
+  }
+}
+function resolveTarget(target?: KeyboardTarget): HTMLElement | null {
+  if (typeof target === 'string') {
+    return document.querySelector(target)
+  }
+  if (target instanceof HTMLElement) {
+    return target
+  }
+  if (typeof target === 'function') {
+    return resolveTarget(target())
   }
   return null
 }
-export const keyboardNavigation: SpliceTreePlugin = {
+
+function getModifiers(e: KeyboardEvent | MouseEvent) {
+  return {
+    shift: e.shiftKey,
+    ctrl: e.ctrlKey,
+    meta: e.metaKey,
+    alt: e.altKey,
+  }
+}
+
+export const keyboardPlugin: SpliceTreePlugin = {
   name: 'keyboard',
-  /**
-   * 键盘导航插件
-   * - 提供 activeId 概念与切换 API
-   * - 支持上下移动、展开/收起与进入子级
-   * - 自动或自定义监听目标元素的键盘事件
-   */
+
   setup(ctx: SpliceTreePluginContext) {
-    const { defaultActive, autoListenKeyboard = true, keyboardTarget, keymap } = ctx.options
-    let activeId: string | undefined = defaultActive
+    const config = (ctx.options?.configuration?.keyboard ?? {}) as {
+      autoListen?: boolean
+      target?: KeyboardTarget
+      keymap?: KeyboardKeymap
+    }
+    const autoListenKeyboard = config.autoListen ?? true
+    const keyboardTarget = config.target
+    const keymap = config.keymap
 
-    Object.defineProperty(ctx.tree, 'activeId', {
-      get() {
-        return activeId
-      },
-      configurable: true,
-      enumerable: true,
-    })
-
-    /**
-     * 切换或设置激活节点
-     * 更新后派发 visibility 事件以刷新视图
-     * @param id 节点 id
-     * @param active 不传表示切换；true/false 表示显式设置
-     */
-    const toggleActive = (id: string, active?: boolean) => {
-      if (active === undefined) {
-        activeId = activeId === id ? undefined : id
-      } else {
-        if (active)
-          activeId = id
-        else if (activeId === id)
-          activeId = undefined
-      }
-      ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
+    const keys = {
+      up: keymap?.up ?? 'ArrowUp',
+      down: keymap?.down ?? 'ArrowDown',
+      left: keymap?.left ?? 'ArrowLeft',
+      right: keymap?.right ?? 'ArrowRight',
     }
 
-    /**
-     * 按可见序列移动激活项
-     * @param delta 移动步长（-1 上一个，1 下一个）
-     */
-    const moveActive = (delta: number) => {
-      const items = ctx.tree.items()
-      if (!items.length) {
-        return
-      }
-      const idx = activeId ? items.findIndex(n => n.id === activeId) : -1
-      const next = Math.max(0, Math.min(items.length - 1, (idx < 0 ? 0 : idx + delta)))
-      activeId = items[next]?.id
-      ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
+    const emitDirection = (direction: 'up' | 'down' | 'left' | 'right', e: KeyboardEvent) => {
+      ctx.events.emit({
+        name: 'input:direction',
+        direction,
+        modifiers: getModifiers(e),
+      })
     }
 
-    /**
-     * 激活上一个可见节点
-     */
-    const keyUp = () => moveActive(-1)
-    /**
-     * 激活下一个可见节点
-     */
-    const keyDown = () => moveActive(1)
-    /**
-     * 左方向键：优先收起；否则激活父节点
-     */
-    const keyLeft = () => {
-      if (!activeId) {
-        return
-      }
-      const node = ctx.tree.getNode(activeId)
-      if (!node) {
-        return
-      }
-      if (ctx.tree.isExpanded(node.id)) {
-        ctx.tree.collapse(node.id)
-      } else if (node.getParent()?.id) {
-        activeId = node.getParent()!.id
-      }
-      ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
-    }
-    /**
-     * 右方向键：优先展开；已展开则进入第一个子节点
-     */
-    const keyRight = () => {
-      if (!activeId) {
-        return
-      }
-      const node = ctx.tree.getNode(activeId)
-      if (!node) {
-        return
-      }
-      if (!ctx.tree.isExpanded(node.id)) {
-        ctx.tree.expand(node.id)
-      } else {
-        const first = node.getChildren()[0]
-        if (first) {
-          activeId = first.id
-        }
-      }
-      ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
-    }
-    /**
-     * 键盘按下事件处理
-     * - 根据 keymap 映射调用对应处理函数
-     * - 自动阻止默认行为以避免滚动
-     */
     const onKeydown = (e: KeyboardEvent) => {
-      const kExpand = keymap?.expand ?? 'ArrowRight'
-      const kCollapse = keymap?.collapse ?? 'ArrowLeft'
-      const kNext = keymap?.next ?? 'ArrowDown'
-      const kPrev = keymap?.prev ?? 'ArrowUp'
-      const key = e.key
-      if (key === kPrev) {
-        e.preventDefault()
-        keyUp()
-        return
-      }
-      if (key === kNext) {
-        e.preventDefault()
-        keyDown()
-        return
-      }
-      if (key === kCollapse) {
-        e.preventDefault()
-        keyLeft()
-        return
-      }
-      if (key === kExpand) {
-        e.preventDefault()
-        keyRight()
+      switch (e.key) {
+        case keys.up:
+          e.preventDefault()
+          emitDirection('up', e)
+          break
+        case keys.down:
+          e.preventDefault()
+          emitDirection('down', e)
+          break
+        case keys.left:
+          e.preventDefault()
+          emitDirection('left', e)
+          break
+        case keys.right:
+          e.preventDefault()
+          emitDirection('right', e)
+          break
       }
     }
+
+    const emitNodeClick = (nodeId: string, e: MouseEvent) => {
+      ctx.events.emit({
+        name: 'input:node-click',
+        nodeId,
+        modifiers: getModifiers(e),
+      })
+    }
+
     if (autoListenKeyboard && typeof document !== 'undefined') {
       setTimeout(() => {
-        const root = resolveKeyboardTarget(keyboardTarget)
-        if (root) {
-          root.setAttribute('tabindex', '0')
-          root?.focus?.()
+        const root = resolveTarget(keyboardTarget)
+        if (!root) {
+          return
         }
+
+        root.setAttribute('tabindex', '0')
+
         const handler = (e: KeyboardEvent) => {
           const active = document.activeElement
-          // 仅当 activeElement 在树容器内时触发
-          if (!root || root.contains(active)) {
+          if (root.contains(active)) {
             onKeydown(e)
           }
         }
+
         document.addEventListener('keydown', handler)
       })
     }
-    return { toggleActive }
-  },
-  /**
-   * 为节点扩展激活态判断方法
-   * - isActive：是否为当前激活项
-   * - toggleActive：切换当前节点的激活态
-   */
-  extendNode(node, ctx) {
-    node.isActive = () => ctx.tree?.activeId === node.id
-    node.toggleActive = (active?: boolean) => {
-      ctx.tree.toggleActive(node.id, active)
+
+    return {
+      emitNodeClick,
     }
   },
 }
 
-export default keyboardNavigation
+export default keyboardPlugin

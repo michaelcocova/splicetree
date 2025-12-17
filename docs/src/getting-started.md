@@ -15,7 +15,7 @@ pnpm add @splicetree/core
 
 ::: tip 安装插件与适配器（按需）
 
-```ts
+```bash
 pnpm add @splicetree/plugin-checkable \
  @splicetree/plugin-dnd \
  @splicetree/plugin-keyboard \

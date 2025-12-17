@@ -7,11 +7,15 @@ export function initDefaultExpansion<T extends SpliceTreeData>(
   lvl: number | 'deepest' | undefined,
 ) {
   const expandAll = () => {
-    for (const id of map.keys()) expanded.add(id)
+    for (const id of map.keys()) {
+      expanded.add(id)
+    }
   }
   const expandByLevel = (lv: number) => {
     for (const n of map.values()) {
-      if (n.level < lv) expanded.add(n.id)
+      if (n.level < lv) {
+        expanded.add(n.id)
+      }
     }
   }
   if (def === true) {
@@ -19,7 +23,9 @@ export function initDefaultExpansion<T extends SpliceTreeData>(
     return
   }
   if (Array.isArray(def)) {
-    for (const id of def) expanded.add(id)
+    for (const id of def) {
+      expanded.add(id)
+    }
     if (lvl === 'deepest') {
       expandAll()
       return

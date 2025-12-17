@@ -46,16 +46,18 @@ export function createSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
     expand(ids: string | string[]) {
       const list = Array.isArray(ids) ? ids : [ids]
       for (const id of list) {
-        if (!(expandedKeys).has(id))
+        if (!(expandedKeys).has(id)) {
           (expandedKeys).add(id)
+        }
       }
       emitVisibility()
     },
     collapse(ids: string | string[]) {
       const list = Array.isArray(ids) ? ids : [ids]
       for (const id of list) {
-        if ((expandedKeys).has(id))
+        if ((expandedKeys).has(id)) {
           (expandedKeys).delete(id)
+        }
       }
       emitVisibility()
     },
@@ -64,17 +66,23 @@ export function createSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
       const toExpand: string[] = []
       const toCollapse: string[] = []
       for (const id of list) {
-        if (tree.isExpanded(id))
+        if (tree.isExpanded(id)) {
           toCollapse.push(id)
-        else toExpand.push(id)
+        } else {
+          toExpand.push(id)
+        }
       }
-      if (toExpand.length)
+      if (toExpand.length) {
         tree.expand(toExpand)
-      if (toCollapse.length)
+      }
+      if (toCollapse.length) {
         tree.collapse(toCollapse)
+      }
     },
     expandAll() {
-      for (const id of map.keys()) (expandedKeys as any).add(id)
+      for (const id of map.keys()) {
+        expandedKeys.add(id)
+      }
       emitVisibility()
     },
     collapseAll() {
@@ -82,9 +90,11 @@ export function createSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
       emitVisibility()
     },
     toggleExpandAll() {
-      if (expandedKeys.size > 0)
+      if (expandedKeys.size > 0) {
         tree.collapseAll()
-      else tree.expandAll()
+      } else {
+        tree.expandAll()
+      }
     },
     appendChildren(parentId: string | undefined, children: T[]) {
       const ctx: NodeContext<T> = {
@@ -121,17 +131,21 @@ export function createSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
   })
   if (options?.plugins?.length) {
     for (const n of map.values()) {
-      for (const plugin of options.plugins!) plugin.extendNode?.(n, pluginCtx)
+      for (const plugin of options.plugins!) {
+        plugin.extendNode?.(n, pluginCtx)
+      }
     }
   }
   for (const node of map.values()) {
     node.isExpanded = () => tree.isExpanded(node.id)
     node.toggleExpand = (expand?: boolean) => {
-      if (expand === undefined)
+      if (expand === undefined) {
         tree.toggleExpand(node.id)
-      else if (expand)
+      } else if (expand) {
         tree.expand(node.id)
-      else tree.collapse(node.id)
+      } else {
+        tree.collapse(node.id)
+      }
     }
   }
   return tree

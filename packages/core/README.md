@@ -1,16 +1,16 @@
 # @splicetree/core
 
+## 简介
+
+SpliceTree 是一个 Headless 树运行时，面向扁平数据构建可操作的树结构，提供精简 API，并通过插件扩展搜索、拖拽、懒加载、键盘导航等能力。
+
+为扁平数据提供轻量、可扩展的树运行时。支持插件扩展事件与能力。
+
 [![version](https://img.shields.io/npm/v/@splicetree/core.svg?label=version)](https://www.npmjs.com/package/@splicetree/core)
 [![downloads](https://img.shields.io/npm/dm/@splicetree/core.svg)](https://npmcharts.com/compare/%40splicetree%2Fcore?minimal=true)
 [![license](https://img.shields.io/npm/l/@splicetree/core.svg)](https://www.npmjs.com/package/@splicetree/core)
 [![Website](https://img.shields.io/static/v1?label=Website&message=splicetree.dev&color=blue)](https://www.splicetree.dev)
 [![GitHub](https://img.shields.io/static/v1?label=GitHub&message=splicetree%2Fsplicetree&logo=github)](https://github.com/michaelcocova/splicetree)
-
-为扁平数据提供轻量、可扩展的树运行时。支持插件扩展事件与能力。
-
-## 简介
-
-SpliceTree 是一个 Headless 树运行时，面向扁平数据构建可操作的树结构，提供精简 API，并通过插件扩展搜索、拖拽、懒加载、键盘导航等能力。
 
 ## 官方文档
 

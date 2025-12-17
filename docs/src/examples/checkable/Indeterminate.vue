@@ -11,7 +11,11 @@ const firstChildId = treeData.find(n => n.parent === rootId)?.id
 const { items } = useSpliceTree(treeData, {
   plugins: [checkable],
   defaultExpanded: rootId ? [rootId] : [],
-  defaultChecked: firstChildId ? [firstChildId] : [],
+  configuration: {
+    checkable: {
+      defaultChecked: firstChildId ? [firstChildId] : [],
+    },
+  },
 })
 </script>
 

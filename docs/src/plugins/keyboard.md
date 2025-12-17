@@ -1,6 +1,6 @@
 # 键盘插件
 
-提供快捷键导航能力：上下移动、展开与收起。
+采集键盘方向输入，派发语义化事件供行为插件消费。
 
 ## 安装
 
@@ -10,13 +10,22 @@
 
 ```ts
 import { createSpliceTree } from '@splicetree/core'
-import { keyboardNavigation } from '@splicetree/keyboard'
+import keyboard from '@splicetree/plugin-keyboard'
+import selectable from '@splicetree/plugin-selectable'
 
 const tree = createSpliceTree(data, {
-  plugins: [keyboardNavigation],
-  defaultActive: 'a',
-  autoListenKeyboard: true,
-  keymap: { expand: 'ArrowRight', collapse: 'ArrowLeft', next: 'ArrowDown', prev: 'ArrowUp' },
+  plugins: [
+    keyboard,
+    selectable,
+  ],
+  configuration: {
+    keyboard: {
+      autoListen: true,
+      target: '.keyboard-area',
+      keymap: { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' },
+    },
+    selectable: { multiple: true },
+  },
 })
 ```
 
@@ -25,35 +34,29 @@ const tree = createSpliceTree(data, {
 ### 基本键盘导航
 
 <demo vue="../examples/keyboard/BasicNavigation.vue" />
-
 ### 自定义键位映射
-
 <demo vue="../examples/keyboard/CustomKeymap.vue" />
-
 ### 自定义键盘监听目标
-
 <demo vue="../examples/keyboard/CustomTarget.vue" />
 
-## Api
+## 事件
 
-### Options
+| 配置项            | 参数                                                            | 说明                                           |
+| ----------------- | --------------------------------------------------------------- | ---------------------------------------------- |
+| `input:direction` | `{ direction: 'up' \| 'down' \| 'left' \| 'right', modifiers }` | 仅派发语义事件；行为由 `selectable` 等插件消费 |
 
-| 选项                 | 类型                                                                   | 默认值          | 说明                             |
-| -------------------- | ---------------------------------------------------------------------- | --------------- | -------------------------------- |
-| `defaultActive`      | `string`                                                               | `undefined`     | 默认激活节点                     |
-| `autoListenKeyboard` | `boolean`                                                              | `true`          | 是否自动监听键盘事件             |
-| `keymap`             | `{ expand?: string; collapse?: string; next?: string; prev?: string }` | `见下`          | 快捷键映射（默认：左右上下箭头） |
-| `keyboardTarget`     | `HTMLElement`                                                          | `document.body` | 键盘监听目标                     |
+## Configuration
 
-### 实例方法
+| 配置项                              | 类型                                         | 默认值          | 说明         |
+| ----------------------------------- | -------------------------------------------- | --------------- | ------------ |
+| `configuration.keyboard.autoListen` | `boolean`                                    | `true`          | 自动监听键盘 |
+| `configuration.keyboard.target`     | `HTMLElement \| string \| () => HTMLElement` | `document.body` | 监听目标     |
+| `configuration.keyboard.keymap`     | `{ up?, down?, left?, right? }`              | 箭头键          | 键位映射     |
 
-| 名称                    | 参数                       | 说明                   |
-| ----------------------- | -------------------------- | ---------------------- |
-| `activeId`              | `无`                       | 当前激活的节点         |
-| `toggleActive(id, on?)` | `id: string; on?: boolean` | 切换或显式设置激活状态 |
+::: tip 行为配合
 
-### 节点方法
+- 与 `@splicetree/plugin-selectable` 组合后：
+  - `up/down`：在可见节点间导航并选中
+  - `left/right`：收起/展开当前激活节点
 
-| 名称                | 参数           | 说明                 |
-| ------------------- | -------------- | -------------------- |
-| `toggleActive(on?)` | `on?: boolean` | 切换或显式设置激活态 |
+:::

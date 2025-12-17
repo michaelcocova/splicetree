@@ -13,23 +13,11 @@ export enum DropPosition {
   AFTER = 1,
 }
 declare module '@splicetree/core' {
-  /**
-   * 插件配置项扩展（DnD）
-   */
-
-  interface UseSpliceTreeOptions {
-    /**
-     * 自动更新父节点
-     * 如果为 false，则不会自动更新父节点
-     * 需要监听 move 事件，手动更新父节点
-     * @default true
-     */
-    autoUpdateParent?: boolean
-    /**
-     * 拖入后自动展开目标节点
-     * @default true
-     */
-    autoExpandOnDrop?: boolean
+  interface SpliceTreeConfiguration {
+    dnd?: {
+      autoUpdateParent?: boolean
+      autoExpandOnDrop?: boolean
+    }
   }
   interface SpliceTreeEventPayloadMap {
     /**
@@ -125,7 +113,11 @@ export const dnd: SpliceTreePlugin = {
    * - 通过 events 派发 move 与 visibility 事件驱动视图刷新
    */
   setup(ctx: SpliceTreePluginContext) {
-    const { autoUpdateParent = true, autoExpandOnDrop = true } = ctx.tree.options || {}
+    const cfg = (ctx.options?.configuration?.dnd ?? {}) as {
+      autoUpdateParent?: boolean
+      autoExpandOnDrop?: boolean
+    }
+    const { autoUpdateParent = true, autoExpandOnDrop = true } = cfg
     const parentField = ctx.tree.options?.parentField ?? 'parent'
     let draggingId: string | undefined
     const hoverPositions = new Map<string, DropPosition>()
@@ -239,9 +231,10 @@ export const dnd: SpliceTreePlugin = {
         return
       }
 
-      const siblings = parentId ? ctx.tree.getNode(parentId)!.getChildren() : ctx.tree.items().filter(n => !n.getParent())
+      const rawSiblings = parentId ? ctx.tree.getNode(parentId)!.getChildren() : ctx.tree.items().filter(n => !n.getParent())
+      const siblings = rawSiblings.filter(n => n.id !== srcId)
       const idx = siblings.findIndex(n => n.id === targetId)
-      const afterSibling = siblings[idx + 1]?.id
+      const afterSibling = idx >= 0 ? siblings[idx + 1]?.id : undefined
       if (autoUpdateParent) {
         ctx.tree.moveNode(srcId, parentId, afterSibling)
         Reflect.set(src.original, parentField, parentId)

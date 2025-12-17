@@ -15,7 +15,13 @@ import checkable from '@splicetree/plugin-checkable'
 const tree = createSpliceTree(data, {
   plugins: [checkable],
   defaultExpanded: ['a'],
-  defaultChecked: ['a'],
+  configuration: {
+    checkable: {
+      defaultChecked: ['a'],
+      // 可选：点击节点即切换勾选
+      triggerByClick: true,
+    },
+  },
 })
 ```
 
@@ -39,11 +45,12 @@ const tree = createSpliceTree(data, {
 
 ## Api
 
-### Options
+### Configuration
 
-| 选项             | 类型       | 默认值 | 说明                   |
-| ---------------- | ---------- | ------ | ---------------------- |
-| `defaultChecked` | `string[]` | `[]`   | 初始勾选的节点 id 集合 |
+| 选项                                     | 类型       | 默认值  | 说明                   |
+| ---------------------------------------- | ---------- | ------- | ---------------------- |
+| `configuration.checkable.defaultChecked` | `string[]` | `[]`    | 初始勾选的节点 id 集合 |
+| `configuration.checkable.triggerByClick` | `boolean`  | `false` | 点击节点切换勾选       |
 
 ### Events
 

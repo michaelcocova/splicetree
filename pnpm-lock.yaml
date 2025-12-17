@@ -1,7 +1,7 @@
 lockfileVersion: '9.0'
 
 settings:
-  autoInstallPeers: false
+  autoInstallPeers: true
   excludeLinksFromLockfile: false
 
 importers:
@@ -63,12 +63,18 @@ importers:
       '@splicetree/plugin-lazy-load':
         specifier: workspace:*
         version: link:../packages/plugins/lazy-load
+      '@splicetree/plugin-pointer':
+        specifier: workspace:*
+        version: link:../packages/plugins/pointer
       '@splicetree/plugin-search':
         specifier: workspace:*
         version: link:../packages/plugins/search
+      '@splicetree/plugin-selectable':
+        specifier: workspace:*
+        version: link:../packages/plugins/selectable
       '@tailwindcss/vite':
         specifier: ^4.1.18
-        version: 4.1.18(vite@8.0.0-beta.2(@types/node@25.0.1)(esbuild@0.25.12)(jiti@2.6.1)(yaml@2.8.2))
+        version: 4.1.18(vite@7.2.7(@types/node@25.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))
       '@vueuse/core':
         specifier: ^14.1.0
         version: 14.1.0(vue@3.5.25(typescript@5.9.3))
@@ -146,7 +152,19 @@ importers:
         specifier: workspace:*
         version: link:../../core
 
+  packages/plugins/pointer:
+    devDependencies:
+      '@splicetree/core':
+        specifier: workspace:*
+        version: link:../../core
+
   packages/plugins/search:
+    devDependencies:
+      '@splicetree/core':
+        specifier: workspace:*
+        version: link:../../core
+
+  packages/plugins/selectable:
     devDependencies:
       '@splicetree/core':
         specifier: workspace:*
@@ -3924,12 +3942,12 @@ snapshots:
       '@tailwindcss/oxide-win32-arm64-msvc': 4.1.18
       '@tailwindcss/oxide-win32-x64-msvc': 4.1.18
 
-  '@tailwindcss/vite@4.1.18(vite@8.0.0-beta.2(@types/node@25.0.1)(esbuild@0.25.12)(jiti@2.6.1)(yaml@2.8.2))':
+  '@tailwindcss/vite@4.1.18(vite@7.2.7(@types/node@25.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2))':
     dependencies:
       '@tailwindcss/node': 4.1.18
       '@tailwindcss/oxide': 4.1.18
       tailwindcss: 4.1.18
-      vite: 8.0.0-beta.2(@types/node@25.0.1)(esbuild@0.25.12)(jiti@2.6.1)(yaml@2.8.2)
+      vite: 7.2.7(@types/node@25.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(yaml@2.8.2)
 
   '@tanstack/virtual-core@3.13.13': {}
 

@@ -107,6 +107,9 @@ export interface SpliceTreeEvents {
  * - `defaultExpandedLevel`：默认展开的层级（或 `'deepest'` 表示展开到最深层）
  * - 其余键允许被插件进行选项扩展
  */
+export interface SpliceTreeConfiguration {
+}
+
 export interface UseSpliceTreeOptions<T = SpliceTreeData> {
   /**
    * 主键字段名
@@ -133,9 +136,12 @@ export interface UseSpliceTreeOptions<T = SpliceTreeData> {
    */
   defaultExpandedLevel?: number | 'deepest'
   /**
+   * 插件配置聚合入口（按插件名分类）
+   */
+  configuration?: Partial<SpliceTreeConfiguration>
+  /**
    * 其余选项键，供插件扩展使用
    */
-  [key: string]: any
 }
 
 /**

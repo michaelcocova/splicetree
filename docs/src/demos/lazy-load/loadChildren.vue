@@ -1,17 +1,21 @@
 <script setup>
-import { lazyLoad } from '@splicetree/lazy-load'
 import { useSpliceTree } from '@splicetree/adapter-vue'
+import { lazyLoad } from '@splicetree/lazy-load'
 import { ChevronRight } from 'lucide-vue-next'
 import { cn } from '@/utils/shadcn'
 import { treeData } from '@/utils/tree'
 
 const { items } = useSpliceTree(treeData, {
   plugins: [lazyLoad],
-  loadChildren: async (node) => {
-    return [
-      { id: `${node.id}-x`, parent: node.id, title: `子节点 X of ${node.id}` },
-      { id: `${node.id}-y`, parent: node.id, title: `子节点 Y of ${node.id}` },
-    ]
+  configuration: {
+    lazyLoad: {
+      loadChildren: async (node) => {
+        return [
+          { id: `${node.id}-x`, parent: node.id, title: `子节点 X of ${node.id}` },
+          { id: `${node.id}-y`, parent: node.id, title: `子节点 Y of ${node.id}` },
+        ]
+      },
+    },
   },
 })
 </script>

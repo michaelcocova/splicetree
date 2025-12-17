@@ -22,7 +22,7 @@ export function createSpliceTreeNode<T>(
     hasChildren: api.hasChildren,
     getParent: api.getParent,
     getChildren: api.getChildren,
-    toggleExpand: api.toggleExpand as any,
+    toggleExpand: api.toggleExpand,
   }
 }
 
@@ -52,17 +52,22 @@ export function buildTree<T extends Record<string, any>>(
       getChildren: () => childrenCache.get(id) ?? [],
       isExpanded: () => expandedKeys.has(id),
       toggleExpand: () => {
-        if (expandedKeys.has(id)) expandedKeys.delete(id)
-        else expandedKeys.add(id)
+        if (expandedKeys.has(id)) {
+          expandedKeys.delete(id)
+        } else {
+          expandedKeys.add(id)
+        }
       },
     })
     map.set(id, node)
   })
 
-  for (const id of map.keys()) childrenCache.set(id, [])
+  for (const id of map.keys()) {
+    childrenCache.set(id, [])
+  }
 
   for (const node of map.values()) {
-    const parentId = Reflect.get(node.original as any, parentField || 'parentId')
+    const parentId = Reflect.get(node.original, parentField || 'parentId')
     if (!parentId) {
       parentCache.set(node.id, undefined)
       roots.push(node)
@@ -70,15 +75,22 @@ export function buildTree<T extends Record<string, any>>(
     }
     const parentNode = map.get(String(parentId))
     parentCache.set(node.id, parentNode ?? undefined)
-    if (parentNode) (childrenCache.get(parentNode.id)!).push(node)
-    else roots.push(node)
+    if (parentNode) {
+      (childrenCache.get(parentNode.id)!).push(node)
+    } else {
+      roots.push(node)
+    }
   }
 
   const dfs = (node: SpliceTreeNode<T>, level: number) => {
     node.level = level
-    for (const child of childrenCache.get(node.id) ?? []) dfs(child, level + 1)
+    for (const child of childrenCache.get(node.id) ?? []) {
+      dfs(child, level + 1)
+    }
   }
-  for (const r of roots) dfs(r, 0)
+  for (const r of roots) {
+    dfs(r, 0)
+  }
 
   return { roots, map, parentCache, childrenCache }
 }
