@@ -1,5 +1,11 @@
 # @splicetree/plugin-keyboard
 
+## 0.1.1
+
+### Patch Changes
+
+- fix: republish plugin-keyboard after partial release failure
+
 ## 0.1.0
 
 ### Minor Changes

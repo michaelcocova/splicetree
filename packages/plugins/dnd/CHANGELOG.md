@@ -1,5 +1,11 @@
 # @splicetree/plugin-dnd
 
+## 0.1.1
+
+### Patch Changes
+
+- fix: republish plugin-dnd after partial release failure
+
 ## 0.1.0
 
 ## 0.0.1

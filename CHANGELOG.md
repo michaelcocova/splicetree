@@ -1,6 +1,96 @@
 # Changelog
 
 
+## v0.1.1, v0.1.0 – 2025-12-17
+
+### @splicetree/plugin-dnd – 0.1.1
+
+### Patch Changes
+
+- fix: republish plugin-dnd after partial release failure
+
+### @splicetree/plugin-keyboard – 0.1.1
+
+### Patch Changes
+
+- fix: republish plugin-keyboard after partial release failure
+
+### @splicetree/plugin-lazy-load – 0.1.1
+
+### Patch Changes
+
+- fix: republish plugin-lazy-load after partial release failure
+
+### @splicetree/plugin-pointer – 0.1.0
+
+### Minor Changes
+
+- ### @splicetree/plugin-pointer
+  - 新增输入插件，采集节点点击事件并派发 `input:node-click`
+  - 事件负载包含修饰键：`shift/ctrl/meta/alt`
+
+### @splicetree/plugin-search – 0.1.1
+
+### Patch Changes
+
+- fix: republish plugin-search after partial release failure
+
+### @splicetree/plugin-selectable – 0.1.0
+
+### Minor Changes
+
+- ### @splicetree/plugin-selectable
+  - 新增行为插件，消费 `input:node-click` 与 `input:direction`
+  - 支持单选/多选与 Shift 范围选择
+  - 配置聚合到 `configuration.selectable`：`multiple/defaultSelected`
+
+---
+
+## v0.1.1, v0.1.0 – 2025-12-17
+
+### @splicetree/plugin-dnd – 0.1.1
+
+### Patch Changes
+
+- fix: republish plugin-dnd after partial release failure
+
+### @splicetree/plugin-keyboard – 0.1.1
+
+### Patch Changes
+
+- fix: republish plugin-keyboard after partial release failure
+
+### @splicetree/plugin-lazy-load – 0.1.1
+
+### Patch Changes
+
+- fix: republish plugin-lazy-load after partial release failure
+
+### @splicetree/plugin-pointer – 0.1.0
+
+### Minor Changes
+
+- ### @splicetree/plugin-pointer
+  - 新增输入插件，采集节点点击事件并派发 `input:node-click`
+  - 事件负载包含修饰键：`shift/ctrl/meta/alt`
+
+### @splicetree/plugin-search – 0.1.1
+
+### Patch Changes
+
+- fix: republish plugin-search after partial release failure
+
+### @splicetree/plugin-selectable – 0.1.0
+
+### Minor Changes
+
+- ### @splicetree/plugin-selectable
+  - 新增行为插件，消费 `input:node-click` 与 `input:direction`
+  - 支持单选/多选与 Shift 范围选择
+  - 配置聚合到 `configuration.selectable`：`multiple/defaultSelected`
+
+---
+
 ## v0.1.0 – 2025-12-17
 
 ### @splicetree/plugin-checkable – 0.1.0
