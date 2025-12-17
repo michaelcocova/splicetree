@@ -4,11 +4,11 @@ import { defineConfig } from 'vitepress'
 import { vitepressDemoPlugin } from 'vitepress-demo-plugin'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  base: '/splicetree/',
+  base: '/',
   lang: 'zh-CN',
   lastUpdated: true,
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/splicetree/logo.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/logo.svg' }],
     [
       'script',
       {},
