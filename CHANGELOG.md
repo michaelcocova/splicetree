@@ -1,6 +1,80 @@
 # Changelog
 
 
+## v0.2.0, v0.1.0 – 2025-12-24
+
+### @splicetree/core – 0.2.0
+
+### Minor Changes
+
+- ### @splicetree/core
+  - 新增 `syncData(next)`：同步数据源并刷新内部缓存与节点扩展
+  - 核心配置聚合到 `options.configuration`
+
+### @splicetree/plugin-pointer – 0.1.0
+
+### Minor Changes
+
+- ### @splicetree/plugin-pointer
+  - 新增输入插件，采集节点点击事件并派发 `input:node-click`
+  - 事件负载包含修饰键：`shift/ctrl/meta/alt`
+
+### @splicetree/plugin-selectable – 0.1.0
+
+### Minor Changes
+
+- ### @splicetree/plugin-selectable
+  - 新增行为插件，消费 `input:node-click` 与 `input:direction`
+  - 支持单选/多选与 Shift 范围选择
+  - 配置聚合到 `configuration.selectable`：`multiple/defaultSelected`
+
+### @splicetree/adapter-vue – 0.2.0
+
+### Patch Changes
+
+- ### @splicetree/adapter-vue
+  - 在构建产物中将 `@splicetree/core` 标记为 external，避免被打包进适配器产物
+  - 当传入 `Ref` 数据源时，使用 core 的 `syncData(next)` 同步更新，避免重建实例导致插件交互失效
+
+---
+
+## v0.2.0, v0.1.0 – 2025-12-24
+
+### @splicetree/core – 0.2.0
+
+### Minor Changes
+
+- ### @splicetree/core
+  - 新增 `syncData(next)`：同步数据源并刷新内部缓存与节点扩展
+  - 核心配置聚合到 `options.configuration`
+
+### @splicetree/plugin-pointer – 0.1.0
+
+### Minor Changes
+
+- ### @splicetree/plugin-pointer
+  - 新增输入插件，采集节点点击事件并派发 `input:node-click`
+  - 事件负载包含修饰键：`shift/ctrl/meta/alt`
+
+### @splicetree/plugin-selectable – 0.1.0
+
+### Minor Changes
+
+- ### @splicetree/plugin-selectable
+  - 新增行为插件，消费 `input:node-click` 与 `input:direction`
+  - 支持单选/多选与 Shift 范围选择
+  - 配置聚合到 `configuration.selectable`：`multiple/defaultSelected`
+
+### @splicetree/adapter-vue – 0.2.0
+
+### Patch Changes
+
+- ### @splicetree/adapter-vue
+  - 在构建产物中将 `@splicetree/core` 标记为 external，避免被打包进适配器产物
+  - 当传入 `Ref` 数据源时，使用 core 的 `syncData(next)` 同步更新，避免重建实例导致插件交互失效
+
+---
+
 ## v0.1.1, v0.1.0 – 2025-12-17
 
 ### @splicetree/plugin-dnd – 0.1.1

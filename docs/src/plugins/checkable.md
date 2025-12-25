@@ -14,8 +14,8 @@ import checkable from '@splicetree/plugin-checkable'
 
 const tree = createSpliceTree(data, {
   plugins: [checkable],
-  defaultExpanded: ['a'],
   configuration: {
+    defaultExpanded: ['a'],
     checkable: {
       defaultChecked: ['a'],
       // 可选：点击节点即切换勾选

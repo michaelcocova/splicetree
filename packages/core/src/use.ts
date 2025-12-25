@@ -20,16 +20,19 @@ export function createSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
   data: T[],
   options: UseSpliceTreeOptions<T> = {},
 ): SpliceTreeInstance<T> {
-  const keyField = options.keyField ?? 'id'
-  const parentField = options.parentField ?? 'parent'
+  const cfg = options.configuration ?? {}
+  const keyField = cfg.keyField ?? 'id'
+  const parentField = cfg.parentField ?? 'parent'
+  const defaultExpanded = cfg.defaultExpanded
+  const defaultExpandedLevel = cfg.defaultExpandedLevel
   const events = createEmitter()
   const expandedKeys = createReactive(new Set<string>(), (payload) => {
     events.emit({ name: 'visibility', keys: Array.from(payload.target) })
   })
 
-  const { roots, map, parentCache, childrenCache } = buildTree<T>(data, keyField, parentField, expandedKeys)
+  let { roots, map, parentCache, childrenCache } = buildTree<T>(data, keyField, parentField, expandedKeys)
 
-  initDefaultExpansion<T>(map, expandedKeys, options.defaultExpanded, options.defaultExpandedLevel)
+  initDefaultExpansion<T>(map, expandedKeys, defaultExpanded, defaultExpandedLevel)
 
   const emitVisibility = () => {
     events.emit({ name: 'visibility', keys: Array.from(expandedKeys) })
@@ -122,6 +125,29 @@ export function createSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
       }
       moveNodeUtil<T>(ctx, id, newParentId, beforeId)
     },
+    syncData(next: T[]) {
+      tree.data = next
+
+      const built = buildTree<T>(next, keyField, parentField, expandedKeys)
+      roots = built.roots
+      map = built.map
+      parentCache = built.parentCache
+      childrenCache = built.childrenCache
+
+      const validIds = new Set<string>(map.keys())
+      const toDelete: string[] = []
+      expandedKeys.forEach((id) => {
+        if (!validIds.has(id)) {
+          toDelete.push(id)
+        }
+      })
+      for (const id of toDelete) {
+        expandedKeys.delete(id)
+      }
+
+      applyNodeExtensions()
+      emitVisibility()
+    },
   }
 
   const pluginCtx: SpliceTreePluginContext<T> = { tree, options, events }
@@ -129,24 +155,29 @@ export function createSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
     const api = plugin.setup?.(pluginCtx)
     Object.assign(tree, api)
   })
-  if (options?.plugins?.length) {
-    for (const n of map.values()) {
-      for (const plugin of options.plugins!) {
-        plugin.extendNode?.(n, pluginCtx)
+
+  function applyNodeExtensions() {
+    if (options?.plugins?.length) {
+      for (const n of map.values()) {
+        for (const plugin of options.plugins!) {
+          plugin.extendNode?.(n, pluginCtx)
+        }
+      }
+    }
+    for (const node of map.values()) {
+      node.isExpanded = () => tree.isExpanded(node.id)
+      node.toggleExpand = (expand?: boolean) => {
+        if (expand === undefined) {
+          tree.toggleExpand(node.id)
+        } else if (expand) {
+          tree.expand(node.id)
+        } else {
+          tree.collapse(node.id)
+        }
       }
     }
   }
-  for (const node of map.values()) {
-    node.isExpanded = () => tree.isExpanded(node.id)
-    node.toggleExpand = (expand?: boolean) => {
-      if (expand === undefined) {
-        tree.toggleExpand(node.id)
-      } else if (expand) {
-        tree.expand(node.id)
-      } else {
-        tree.collapse(node.id)
-      }
-    }
-  }
+
+  applyNodeExtensions()
   return tree
 }

@@ -5,7 +5,9 @@ import { customFieldData } from '@/utils/data'
 import { cn } from '@/utils/shadcn'
 
 const { items } = useSpliceTree(customFieldData({ parent: '_parent' }), {
-  parentField: '_parent',
+  configuration: {
+    parentField: '_parent',
+  },
 })
 </script>
 

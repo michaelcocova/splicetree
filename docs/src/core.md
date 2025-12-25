@@ -15,9 +15,11 @@ const data = [
 ]
 
 const tree = createSpliceTree(data, {
-  keyField: 'id',
-  parentField: 'parent',
-  defaultExpanded: ['a'],
+  configuration: {
+    keyField: 'id',
+    parentField: 'parent',
+    defaultExpanded: ['a'],
+  },
 })
 
 for (const node of tree.items()) {
@@ -49,8 +51,8 @@ for (const node of tree.items()) {
 
 ::: tip 从上面示例可以看到 默认展开所有层级 支持 2 种方式
 
-- `defaultExpanded: true`
-- `defaultExpandedLevel: 'deepest'`
+- `configuration.defaultExpanded: true`
+- `configuration.defaultExpandedLevel: 'deepest'`
 
 :::
 
@@ -70,41 +72,42 @@ for (const node of tree.items()) {
 
 ### 参数
 
-| 参数                   | 类型                  | 默认值      | 说明                                    |
-| ---------------------- | --------------------- | ----------- | --------------------------------------- |
-| `keyField`             | `string`              | `'id'`      | 作为节点唯一键的字段名                  |
-| `parentField`          | `string`              | `'parent'`  | 作为父引用的字段名                      |
-| `plugins`              | `SpliceTreePlugin[]`  | `[]`        | 插件列表                                |
-| `defaultExpanded`      | `true \| string[]`    | `[]`        | 初始展开：`true` 展开全部或指定 ID 列表 |
-| `defaultExpandedLevel` | `number \| 'deepest'` | `undefined` | 初始展开层级：数字或 `'deepest'`        |
+| 参数                                 | 类型                  | 默认值      | 说明                                    |
+| ------------------------------------ | --------------------- | ----------- | --------------------------------------- |
+| `plugins`                            | `SpliceTreePlugin[]`  | `[]`        | 插件列表                                |
+| `configuration.keyField`             | `string`              | `'id'`      | 作为节点唯一键的字段名                  |
+| `configuration.parentField`          | `string`              | `'parent'`  | 作为父引用的字段名                      |
+| `configuration.defaultExpanded`      | `true \| string[]`    | `[]`        | 初始展开：`true` 展开全部或指定 ID 列表 |
+| `configuration.defaultExpandedLevel` | `number \| 'deepest'` | `undefined` | 初始展开层级：数字或 `'deepest'`        |
 
 ::: danger 默认展开的优先级与规则
 
-- 当 `defaultExpanded === true`：忽略 `defaultExpandedLevel`，直接展开全部
-- 当 `defaultExpanded` 为 `string[]`：
+- 当 `configuration.defaultExpanded === true`：忽略 `configuration.defaultExpandedLevel`，直接展开全部
+- 当 `configuration.defaultExpanded` 为 `string[]`：
   - 展开这些 ID 对应节点
-  - 若同时提供 `defaultExpandedLevel`：`'deepest'` 则展开全部；数字则按层级追加展开
-- 当未提供 `defaultExpanded`：使用 `defaultExpandedLevel`（`'deepest'` 展开全部，数字按层级展开）
+  - 若同时提供 `configuration.defaultExpandedLevel`：`'deepest'` 则展开全部；数字则按层级追加展开
+- 当未提供 `configuration.defaultExpanded`：使用 `configuration.defaultExpandedLevel`（`'deepest'` 展开全部，数字按层级展开）
 
 :::
 
 ### 实例方法
 
-| 名称                                   | 参数                                                              | 说明                             |
-| -------------------------------------- | ----------------------------------------------------------------- | -------------------------------- |
-| `items()`                              | -                                                                 | 返回当前可见节点序列             |
-| `getNode(id)`                          | `id: string`                                                      | 通过 id 获取节点                 |
-| `events`                               | -                                                                 | 事件总线（`on/emit`）            |
-| `expandedKeys()`                       | -                                                                 | 获取已展开的节点集合（数组）     |
-| `isExpanded(id)`                       | `id: string`                                                      | 判断节点是否展开                 |
-| `expand(ids)`                          | `ids: string \| string[]`                                         | 展开单个或多个节点               |
-| `collapse(ids)`                        | `ids: string \| string[]`                                         | 收起单个或多个节点               |
-| `toggleExpand(ids)`                    | `ids: string \| string[]`                                         | 切换单个或多个节点的展开状态     |
-| `expandAll()`                          | -                                                                 | 展开全部节点                     |
-| `collapseAll()`                        | -                                                                 | 收起全部节点                     |
-| `toggleExpandAll()`                    | -                                                                 | 切换“全部展开/全部收起”          |
-| `appendChildren(parentId, children)`   | `parentId: string \| undefined; children: T[]`                    | 追加子节点                       |
-| `moveNode(id, newParentId, beforeId?)` | `id: string; newParentId: string \| undefined; beforeId?: string` | 移动节点到新父级并可指定插入位置 |
+| 名称                                   | 参数                                                              | 说明                               |
+| -------------------------------------- | ----------------------------------------------------------------- | ---------------------------------- |
+| `items()`                              | -                                                                 | 返回当前可见节点序列               |
+| `getNode(id)`                          | `id: string`                                                      | 通过 id 获取节点                   |
+| `events`                               | -                                                                 | 事件总线（`on/emit`）              |
+| `expandedKeys()`                       | -                                                                 | 获取已展开的节点集合（数组）       |
+| `isExpanded(id)`                       | `id: string`                                                      | 判断节点是否展开                   |
+| `expand(ids)`                          | `ids: string \| string[]`                                         | 展开单个或多个节点                 |
+| `collapse(ids)`                        | `ids: string \| string[]`                                         | 收起单个或多个节点                 |
+| `toggleExpand(ids)`                    | `ids: string \| string[]`                                         | 切换单个或多个节点的展开状态       |
+| `expandAll()`                          | -                                                                 | 展开全部节点                       |
+| `collapseAll()`                        | -                                                                 | 收起全部节点                       |
+| `toggleExpandAll()`                    | -                                                                 | 切换“全部展开/全部收起”            |
+| `appendChildren(parentId, children)`   | `parentId: string \| undefined; children: T[]`                    | 追加子节点                         |
+| `moveNode(id, newParentId, beforeId?)` | `id: string; newParentId: string \| undefined; beforeId?: string` | 移动节点到新父级并可指定插入位置   |
+| `syncData(next)`                       | `next: T[]`                                                       | 同步数据源并刷新内部缓存与节点扩展 |
 
 ### 节点属性
 

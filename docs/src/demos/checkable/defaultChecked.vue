@@ -7,8 +7,7 @@ import { treeData } from '@/utils/tree'
 
 const { items } = useSpliceTree(treeData, {
   plugins: [checkable],
-  defaultExpanded: ['a'],
-  configuration: { checkable: { defaultChecked: ['a'] } },
+  configuration: { defaultExpanded: ['a'], checkable: { defaultChecked: ['a'] } },
 })
 </script>
 

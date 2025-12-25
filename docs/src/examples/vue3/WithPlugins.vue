@@ -11,6 +11,7 @@ import { cn } from '@/utils/shadcn'
 const api = useSpliceTree(treeData, {
   plugins: [dnd, pointer, keyboard, selectable],
   configuration: {
+    defaultExpanded: ['berries', 'citrus'],
     keyboard: {
       autoListen: true,
       target: '.keyboard-wrap',
@@ -23,7 +24,6 @@ const api = useSpliceTree(treeData, {
       autoUpdateParent: true,
     },
   },
-  defaultExpanded: ['berries', 'citrus'],
 })
 const { items, dragProps } = api
 </script>

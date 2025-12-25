@@ -10,7 +10,9 @@
 import { useSpliceTree } from '@splicetree/adapter-vue'
 
 const { items, expand, collapse, toggleExpand } = useSpliceTree(data, {
-  defaultExpanded: ['a'],
+  configuration: {
+    defaultExpanded: ['a'],
+  },
 })
 ```
 

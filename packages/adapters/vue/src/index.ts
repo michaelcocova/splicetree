@@ -29,7 +29,7 @@ export function useSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
   watch(
     () => toValue(data),
     () => {
-      createTree()
+      api.value.syncData(toValue(data))
     },
     { deep: true, immediate: false },
   )

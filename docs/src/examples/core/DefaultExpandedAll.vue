@@ -5,7 +5,9 @@ import { treeData } from '@/utils/data'
 import { cn } from '@/utils/shadcn'
 
 const { items } = useSpliceTree(treeData, {
-  defaultExpanded: true,
+  configuration: {
+    defaultExpanded: true,
+  },
 })
 </script>
 
