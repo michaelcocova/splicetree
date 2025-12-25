@@ -1,6 +1,38 @@
 # Changelog
 
 
+## v0.2.0 – 2025-12-25
+
+### @splicetree/core – 0.2.0
+
+### Minor Changes
+
+- ### @splicetree/core
+  - 新增 `syncData(next)`：同步数据源并刷新内部缓存与节点扩展
+  - 核心配置聚合到 `options.configuration`
+
+### @splicetree/plugin-pointer – 0.2.0
+
+### Minor Changes
+
+- chore: align pointer/selectable versions with other plugins
+
+### @splicetree/plugin-selectable – 0.2.0
+
+### Minor Changes
+
+- chore: align pointer/selectable versions with other plugins
+
+### @splicetree/adapter-vue – 0.2.0
+
+### Patch Changes
+
+- ### @splicetree/adapter-vue
+  - 在构建产物中将 `@splicetree/core` 标记为 external，避免被打包进适配器产物
+  - 当传入 `Ref` 数据源时，使用 core 的 `syncData(next)` 同步更新，避免重建实例导致插件交互失效
+
+---
+
 ## v0.2.0, v0.1.0 – 2025-12-24
 
 ### @splicetree/core – 0.2.0
