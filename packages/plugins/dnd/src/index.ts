@@ -118,7 +118,7 @@ export const dnd: SpliceTreePlugin = {
       autoExpandOnDrop?: boolean
     }
     const { autoUpdateParent = true, autoExpandOnDrop = true } = cfg
-    const parentField = ctx.tree.options?.parentField ?? 'parent'
+    const parentField = ctx.tree.options?.configuration?.parentField ?? 'parent'
     let draggingId: string | undefined
     const hoverPositions = new Map<string, DropPosition>()
 

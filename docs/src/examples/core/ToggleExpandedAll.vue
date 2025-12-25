@@ -6,7 +6,9 @@ import { treeData } from '@/utils/data'
 import { cn } from '@/utils/shadcn'
 
 const { items, collapseAll, expandAll, toggleExpandAll } = useSpliceTree(treeData, {
-  defaultExpanded: true,
+  configuration: {
+    defaultExpanded: true,
+  },
 })
 </script>
 

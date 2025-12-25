@@ -38,9 +38,11 @@ const data = [
 ]
 
 const tree = createSpliceTree(data, {
-  keyField: 'id',
-  parentField: 'parent',
-  defaultExpanded: ['a'],
+  configuration: {
+    keyField: 'id',
+    parentField: 'parent',
+    defaultExpanded: ['a'],
+  },
   plugins: [checkable],
 })
 
@@ -56,7 +58,9 @@ import { useSpliceTree } from '@splicetree/adapter-vue'
 import checkable from '@splicetree/plugin-checkable'
 
 const { items } = useSpliceTree(data, {
-  defaultExpanded: ['a'],
+  configuration: {
+    defaultExpanded: ['a'],
+  },
   plugins: [checkable],
 })
 ```

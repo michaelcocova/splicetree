@@ -2,10 +2,12 @@
 import { useSpliceTree } from '@splicetree/adapter-vue'
 import dnd from '@splicetree/plugin-dnd'
 import { ChevronRight } from 'lucide-vue-next'
+import { ref } from 'vue'
 import { treeData } from '@/utils/data'
 import { cn } from '@/utils/shadcn'
 
-const { items, dragProps } = useSpliceTree(treeData, {
+const data = ref(treeData)
+const { items, dragProps } = useSpliceTree(data, {
   plugins: [dnd],
 })
 </script>

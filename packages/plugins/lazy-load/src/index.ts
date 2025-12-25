@@ -101,7 +101,7 @@ export const lazyLoad: SpliceTreePlugin = {
       if (children?.length) {
         ctx.tree.appendChildren(id, children)
         for (const c of children) {
-          const childId = String(Reflect.get(c, ctx.tree.options?.keyField ?? 'id'))
+          const childId = String(Reflect.get(c, ctx.tree.options?.configuration?.keyField ?? 'id'))
           const childNode = ctx.tree.getNode(childId)
           if (childNode) {
             applyLazyOverrides(childNode)

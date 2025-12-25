@@ -100,17 +100,10 @@ export interface SpliceTreeEvents {
 
 /**
  * `createSpliceTree` 的选项
- * - `keyField`：主键字段名，默认 `'id'`
- * - `parentField`：父级字段名，默认 `'parent'`
  * - `plugins`：插件列表
- * - `defaultExpanded`：默认展开的节点 id 列表（或设为 true 表示全部展开）
- * - `defaultExpandedLevel`：默认展开的层级（或 `'deepest'` 表示展开到最深层）
  * - 其余键允许被插件进行选项扩展
  */
 export interface SpliceTreeConfiguration {
-}
-
-export interface UseSpliceTreeOptions<T = SpliceTreeData> {
   /**
    * 主键字段名
    * @default 'id'
@@ -122,10 +115,6 @@ export interface UseSpliceTreeOptions<T = SpliceTreeData> {
    */
   parentField?: string
   /**
-   * 插件列表
-   */
-  plugins?: SpliceTreePlugin<T>[]
-  /**
    * 默认展开的节点 ID 列表
    * 设为 true 表示默认展开所有节点
    */
@@ -135,6 +124,13 @@ export interface UseSpliceTreeOptions<T = SpliceTreeData> {
    * 设为 'deepest' 表示默认展开所有层级
    */
   defaultExpandedLevel?: number | 'deepest'
+}
+
+export interface UseSpliceTreeOptions<T = SpliceTreeData> {
+  /**
+   * 插件列表
+   */
+  plugins?: SpliceTreePlugin<T>[]
   /**
    * 插件配置聚合入口（按插件名分类）
    */
@@ -223,6 +219,7 @@ export interface SpliceTreeInstance<T = SpliceTreeData> {
    * @param beforeId 插入到指定兄弟节点之前（不传表示末尾）
    */
   moveNode: (id: string, newParentId: string | undefined, beforeId?: string) => void
+  syncData: (next: T[]) => void
 }
 
 /**
