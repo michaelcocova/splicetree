@@ -37,6 +37,18 @@ const tree = createSpliceTree(data, {
 
 ## Api
 
+- Configuration
+
+| 选项                                      | 类型        | 默认值 | 说明                         |
+| ----------------------------------------- | ----------- | ------ | ---------------------------- |
+| `configuration.selectable.multiple`       | `boolean`   | `false`| 是否启用多选                 |
+| `configuration.selectable.defaultSelected`| `string[]`  | `[]`   | 初始选中节点 id 集合         |
+
+- 行为
+  - 单选：点击选中当前节点
+  - 多选：
+    - 普通点击采用单选语义：清空其它选中，仅选中当前节点；再次点击已选中节点则取消选中
+    - `Ctrl/Cmd` 切换选中；`Shift` 范围选择
 - 实例
   - `selectedKeys: Set<string>` 当前选中集合
   - `lastSelectedKey?: string` 最近一次选中的 id

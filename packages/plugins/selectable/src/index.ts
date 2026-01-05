@@ -96,12 +96,16 @@ export const selectablePlugin: SpliceTreePlugin = {
       }
       const shift = modifiers.shift
       const multiToggle = multiple && (modifiers.ctrl || modifiers.meta)
-      if (shift && lastSelectedKey) {
+      if (shift && multiple && lastSelectedKey) {
         selectRange(lastSelectedKey, nodeId)
       } else if (multiToggle) {
         toggleSelect(nodeId)
       } else {
-        toggleSelect(nodeId, true)
+        const wasSelected = isSelected(nodeId)
+        if (multiple) {
+          selectedKeys.clear()
+        }
+        toggleSelect(nodeId, !wasSelected)
       }
     })
 
@@ -130,6 +134,9 @@ export const selectablePlugin: SpliceTreePlugin = {
             if (parent) {
               ctx.tree.activeId = parent.id
               if (!(modifiers.ctrl || modifiers.meta)) {
+                if (multiple) {
+                  selectedKeys.clear()
+                }
                 toggleSelect(parent.id, true)
               }
             }
@@ -138,6 +145,9 @@ export const selectablePlugin: SpliceTreePlugin = {
           if (node.hasChildren()) {
             node.toggleExpand(true)
             if (!(modifiers.ctrl || modifiers.meta)) {
+              if (multiple) {
+                selectedKeys.clear()
+              }
               toggleSelect(node.id, true)
             }
           }
@@ -158,6 +168,9 @@ export const selectablePlugin: SpliceTreePlugin = {
       if (modifiers.shift && multiple && lastSelectedKey) {
         selectRange(lastSelectedKey, nextId)
       } else if (!(modifiers.ctrl || modifiers.meta)) {
+        if (multiple) {
+          selectedKeys.clear()
+        }
         toggleSelect(nextId, true)
       }
     })

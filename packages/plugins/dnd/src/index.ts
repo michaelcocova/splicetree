@@ -1,23 +1,12 @@
 import type { SpliceTreePlugin, SpliceTreePluginContext } from '@splicetree/core'
+import type { DndNode, DndOptions, DragBehavior } from './types'
+import { computePosition } from './position'
+import { DropPosition } from './types'
 import '@splicetree/core'
 
-/**
- * 拖拽落点位置
- * - BEFORE: 目标之前插入
- * - INSIDE: 作为目标的子节点插入
- * - AFTER:  目标之后插入
- */
-export enum DropPosition {
-  BEFORE = -1,
-  INSIDE = 0,
-  AFTER = 1,
-}
 declare module '@splicetree/core' {
   interface SpliceTreeConfiguration {
-    dnd?: {
-      autoUpdateParent?: boolean
-      autoExpandOnDrop?: boolean
-    }
+    dnd?: DndOptions
   }
   interface SpliceTreeEventPayloadMap {
     /**
@@ -38,69 +27,46 @@ declare module '@splicetree/core' {
      * @param position 落点位置（前/内/后）
      */
     drop: (srcId: string, targetId: string, position: DropPosition) => void
-    /**
-     * 当前拖拽源节点 id
-     */
+    /** 当前拖拽源节点 id */
     draggingId?: string
-    /**
-     * 目标节点的悬停位置映射
-     */
+    /** 目标节点的悬停位置映射 */
     hoverPositions: Map<string, DropPosition>
-    /**
-     * DOM 事件：开始拖拽
-     */
+    /** DOM 事件：开始拖拽 */
     onDragStart: (id: string) => void
-    /**
-     * DOM 事件：悬停计算并更新位置
-     */
+    /** DOM 事件：悬停计算并更新位置 */
     onDragOver: (id: string, el: HTMLElement, e: DragEvent | MouseEvent) => void
-    /**
-     * DOM 事件：离开目标，清理悬停状态
-     */
+    /** DOM 事件：离开目标，清理悬停状态 */
     onDragLeave: (id: string) => void
-    /**
-     * DOM 事件：在目标上释放后执行移动
-     */
+    /** DOM 事件：在目标上释放后执行移动 */
     onDrop: (targetId: string) => void
-    /**
-     * 可直接 v-bind 到节点的拖拽属性集合
-     */
-    dragProps: {
-      /**
-       * 是否可拖拽
-       */
+    /** 可直接 v-bind 到节点的拖拽属性集合（逐节点） */
+    dragProps: (id: string, behavior?: DragBehavior) => {
+      /** 是否可拖拽 */
       draggable: boolean
-      /**
-       * 原生拖拽开始事件处理
-       */
+      /** 原生拖拽开始事件处理 */
       onDragstart: (e: DragEvent) => void
-      /**
-       * 原生拖拽悬停事件处理
-       */
+      /** 原生拖拽悬停事件处理 */
       onDragover: (e: DragEvent) => void
-      /**
-       * 原生拖拽离开事件处理
-       */
+      /** 原生拖拽离开事件处理 */
       onDragleave: (e: DragEvent) => void
-      /**
-       * 原生拖拽释放事件处理
-       */
+      /** 原生拖拽释放事件处理 */
       onDrop: (e: DragEvent) => void
     }
+    /** 统一占位样式绑定对象 */
+    ghostStyle: (opts?: { padding?: boolean, margin?: boolean }) => Record<string, any>
   }
 
   /**
    * 节点扩展（DnD）
    */
   interface SpliceTreeNode {
-    /**
-     * 获取当前节点的悬停落点位置
-     */
+    /** 获取当前节点的悬停落点位置 */
     getDropPosition: () => (DropPosition | undefined)
-    /**
-     * 当前节点是否为拖拽源
-     */
+    /** 当前节点是否为拖拽源 */
     isDragging: () => boolean
+
+    /** 当前节点是否被禁用  */
+    isDisabled?: () => boolean
   }
 }
 
@@ -113,20 +79,56 @@ export const dnd: SpliceTreePlugin = {
    * - 通过 events 派发 move 与 visibility 事件驱动视图刷新
    */
   setup(ctx: SpliceTreePluginContext) {
-    const cfg = (ctx.options?.configuration?.dnd ?? {}) as {
-      autoUpdateParent?: boolean
-      autoExpandOnDrop?: boolean
-    }
-    const { autoUpdateParent = true, autoExpandOnDrop = true } = cfg
+    const opts = (ctx.options?.configuration?.dnd ?? {}) as DndOptions
+    const {
+      autoExpandOnDrop = true,
+      autoUpdateParent = true,
+      readonly = false,
+    } = opts
     const parentField = ctx.tree.options?.configuration?.parentField ?? 'parent'
     let draggingId: string | undefined
     const hoverPositions = new Map<string, DropPosition>()
+    let ghostTop = 0
+    let ghostHeight = 0
+    let ghostPos: DropPosition | undefined
+    let ghostInsetLeft = 0
+    let ghostInsetRight = 0
+    let ghostMarginLeft = 0
+    let ghostMarginRight = 0
+    const behaviors = new Map<string, DragBehavior>()
+
+    const isDisabledById = (_id: string | undefined): boolean => !!readonly
+
+    const getDraggedNodeIds = (primaryId: string): string[] => {
+      const tree = ctx.tree as any
+      if (tree.selectedKeys && tree.selectedKeys.has(primaryId)) {
+        const selected = new Set(tree.selectedKeys as Set<string>)
+        const validIds = Array.from(selected).filter((id) => {
+          if (isDisabledById(id)) {
+            return false
+          }
+          const ov = behaviors.get(id as string)
+          if (ov?.draggable === false) {
+            return false
+          }
+          return true
+        })
+
+        const allItems = ctx.tree.items()
+        const sorted = allItems.filter(node => validIds.includes(node.id)).map(n => n.id)
+        return sorted
+      }
+      return [primaryId]
+    }
 
     /**
      * 开始拖拽：记录拖拽源并通知视图刷新（用于高亮拖拽源）
      * @param id 源节点 id
      */
     const onDragStart = (id: string) => {
+      if (isDisabledById(id)) {
+        return
+      }
       draggingId = id
       ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
     }
@@ -139,25 +141,7 @@ export const dnd: SpliceTreePlugin = {
      * @param el 目标节点元素
      * @param e 拖拽/鼠标事件
      */
-    const computePosition = (id: string, el: HTMLElement, e: DragEvent | MouseEvent): DropPosition | undefined => {
-      const rect = el.getBoundingClientRect()
-      const y = ('clientY' in e ? e.clientY : 0) - rect.top
-      const ratio = Math.max(0, Math.min(1, y / rect.height))
-      if (ratio < 0.33) {
-        return DropPosition.BEFORE
-      }
-      if (ratio > 0.66) {
-        return DropPosition.AFTER
-      }
-      if (draggingId === id) {
-        return undefined
-      }
-      const parentId = ctx.tree.getNode(draggingId!)?.getParent()?.id
-      if (parentId === id) {
-        return undefined
-      }
-      return DropPosition.INSIDE
-    }
+    // 使用独立位置计算模块
 
     /**
      * 悬停：更新目标的悬停位置映射并刷新视图
@@ -166,11 +150,92 @@ export const dnd: SpliceTreePlugin = {
      * @param e 拖拽/鼠标事件
      */
     const onDragOver = (id: string, el: HTMLElement, e: DragEvent | MouseEvent) => {
-      const pos = computePosition(id, el, e)
-      if (pos === undefined) {
+      // 如果没有拖拽源，直接返回
+      if (!draggingId) {
+        return
+      }
+
+      const draggedIds = getDraggedNodeIds(draggingId)
+      const targetNode = ctx.tree.getNode(id)
+
+      // 1. 目标节点不能是拖拽节点之一
+      if (draggedIds.includes(id)) {
         hoverPositions.delete(id)
+        ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
+        return
+      }
+
+      // 2. 目标节点不能是任何拖拽节点的后代（防止循环）
+      let ancestor = targetNode?.getParent()
+      while (ancestor) {
+        if (draggedIds.includes(ancestor.id)) {
+          hoverPositions.delete(id)
+          ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
+          return
+        }
+        ancestor = ancestor.getParent()
+      }
+
+      // 这里的 src 参数传 undefined，因为我们已经手动检查了 draggedIds
+      const pos = computePosition(id, el, e, undefined)
+
+      if (!targetNode || pos === undefined) {
+        hoverPositions.delete(id)
+        ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
+        return
+      }
+
+      // 3. 检查所有拖拽节点的行为约束
+      if (pos === DropPosition.INSIDE) {
+        // 如果目标已经是某个拖拽节点的父节点，则 INSIDE 无意义（或者是 no-op）
+        // computePosition 原逻辑是 parentId === targetId 返回 undefined
+        const isParentOfAny = draggedIds.some((dId) => {
+          const node = ctx.tree.getNode(dId)
+          return node?.getParent()?.id === id
+        })
+        if (isParentOfAny) {
+          hoverPositions.delete(id)
+          ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
+          return
+        }
+
+        const allNestable = draggedIds.every((dId) => {
+          const ov = behaviors.get(dId)
+          return ov?.nestable !== false
+        })
+        if (!allNestable) {
+          hoverPositions.delete(id)
+          ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
+          return
+        }
       } else {
-        hoverPositions.set(id, pos)
+        const allSortable = draggedIds.every((dId) => {
+          const ov = behaviors.get(dId)
+          return ov?.sortable !== false
+        })
+        if (!allSortable) {
+          hoverPositions.delete(id)
+          ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
+          return
+        }
+      }
+
+      hoverPositions.set(id, pos)
+      ghostTop = el.offsetTop
+      ghostHeight = el.offsetHeight
+      ghostPos = pos
+      const parent = el.parentElement
+      if (parent) {
+        const styles = getComputedStyle(parent)
+        ghostInsetLeft = Number.parseFloat(styles.paddingLeft || '0')
+        ghostInsetRight = Number.parseFloat(styles.paddingRight || '0')
+        ghostMarginLeft = Number.parseFloat(styles.marginLeft || '0')
+        ghostMarginRight = Number.parseFloat(styles.marginRight || '0')
+      } else {
+        ghostInsetLeft = 0
+        ghostInsetRight = 0
+        ghostMarginLeft = 0
+        ghostMarginRight = 0
       }
       ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
     }
@@ -198,15 +263,29 @@ export const dnd: SpliceTreePlugin = {
       if (!src || !target) {
         return
       }
+      if (readonly) {
+        return
+      }
+      const ov = behaviors.get(src.id)
+      if (ov?.draggable === false) {
+        return
+      }
+      if (position === DropPosition.INSIDE && ov?.nestable === false) {
+        return
+      }
+      if (position !== DropPosition.INSIDE && ov?.sortable === false) {
+        return
+      }
+      // 基础非法：不能拖到自身或其父
       if (srcId === targetId) {
         return
       }
       const srcParentId = src.getParent()?.id
+      if (position === DropPosition.INSIDE && srcParentId === targetId) {
+        return
+      }
 
       if (position === DropPosition.INSIDE) {
-        if (targetId === srcParentId) {
-          return
-        }
         if (autoUpdateParent) {
           ctx.tree.moveNode(srcId, targetId)
           Reflect.set(src.original, parentField, targetId)
@@ -252,13 +331,23 @@ export const dnd: SpliceTreePlugin = {
         return
       }
       const pos = hoverPositions.get(targetId)
-      if (pos === DropPosition.BEFORE) {
-        drop(draggingId, targetId, DropPosition.BEFORE)
-      } else if (pos === DropPosition.AFTER) {
-        drop(draggingId, targetId, DropPosition.AFTER)
-      } else if (pos === DropPosition.INSIDE) {
-        drop(draggingId, targetId, DropPosition.INSIDE)
+      if (pos === undefined) {
+        hoverPositions.clear()
+        draggingId = undefined
+        ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
+        return
       }
+
+      const draggedIds = getDraggedNodeIds(draggingId)
+      let idsToProcess = draggedIds
+      if (pos === DropPosition.AFTER) {
+        idsToProcess = [...draggedIds].reverse()
+      }
+
+      for (const id of idsToProcess) {
+        drop(id, targetId, pos)
+      }
+
       hoverPositions.clear()
       draggingId = undefined
       ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
@@ -266,40 +355,56 @@ export const dnd: SpliceTreePlugin = {
 
     /**
      * 绑定到节点的拖拽属性集，便于直接 v-bind
+     * @param id 节点 ID
      */
-    const dragProps = {
-      draggable: true,
-      onDragstart: (e: DragEvent) => {
-        const el = e.currentTarget as HTMLElement
-        const id = el?.dataset?.id
-        if (id) {
-          e.dataTransfer?.setData('text/plain', id)
-          onDragStart(id)
-        }
-      },
-      onDragover: (e: DragEvent) => {
-        e.preventDefault()
-        const el = e.currentTarget as HTMLElement
-        const id = el?.dataset?.id
-        if (id) {
+    const dragProps = (id: string, behavior?: DragBehavior) => {
+      if (behavior) {
+        behaviors.set(id, behavior)
+      }
+      const canDrag = behavior?.draggable === false ? false : !isDisabledById(id)
+      return {
+        draggable: canDrag,
+        onDragstart: (e: DragEvent) => {
+          if (canDrag) {
+            e.dataTransfer?.setData('text/plain', id)
+            onDragStart(id)
+          }
+        },
+        onDragover: (e: DragEvent) => {
+          e.preventDefault()
+          const el = e.currentTarget as HTMLElement
           onDragOver(id, el, e)
-        }
-      },
-      onDragleave: (e: DragEvent) => {
-        const el = e.currentTarget as HTMLElement
-        const id = el?.dataset?.id
-        if (id) {
+        },
+        onDragleave: (_e: DragEvent) => {
           onDragLeave(id)
-        }
-      },
-      onDrop: (e: DragEvent) => {
-        e.preventDefault()
-        const el = e.currentTarget as HTMLElement
-        const id = el?.dataset?.id
-        if (id) {
+        },
+        onDrop: (e: DragEvent) => {
+          e.preventDefault()
           onDrop(id)
-        }
-      },
+        },
+      }
+    }
+
+    const ghostStyle = (opts?: { padding?: boolean, margin?: boolean }) => {
+      if (!draggingId || ghostPos === undefined) {
+        return { style: { display: 'none' } }
+      }
+      const usePadding = opts?.padding ?? true
+      const useMargin = opts?.margin ?? true
+      const leftInset = usePadding ? ghostInsetLeft : 0
+      const rightInset = usePadding ? ghostInsetRight : 0
+      const leftMargin = useMargin ? ghostMarginLeft : 0
+      const rightMargin = useMargin ? ghostMarginRight : 0
+      const left = `${leftInset + leftMargin}px`
+      const right = `${rightInset + rightMargin}px`
+      const base: Record<string, any> = { position: 'absolute', left, right, pointerEvents: 'none' }
+      if (ghostPos === DropPosition.BEFORE) {
+        return { 'style': { ...base, top: `${ghostTop}px`, height: '2px', background: 'var(--vp-code-color)', borderRadius: '2px' }, 'data-drop-position': -1 }
+      }
+      if (ghostPos === DropPosition.AFTER) {
+        return { 'style': { ...base, top: `${ghostTop + ghostHeight}px`, height: '2px', background: 'var(--vp-code-color)', borderRadius: '2px' }, 'data-drop-position': 1 }
+      }
+      return { 'style': { ...base, top: `${ghostTop}px`, height: `${ghostHeight}px`, background: 'var(--vp-code-color)', opacity: 0.15, borderRadius: '4px' }, 'data-drop-position': 0 }
     }
 
     return {
@@ -317,6 +422,7 @@ export const dnd: SpliceTreePlugin = {
       },
       // 通用 DOM 绑定集合
       dragProps,
+      ghostStyle,
     }
   },
   /**
@@ -327,7 +433,11 @@ export const dnd: SpliceTreePlugin = {
   extendNode(node, ctx) {
     node.getDropPosition = () => ctx.tree.hoverPositions.get(node.id)
     node.isDragging = () => ctx.tree.draggingId === node.id
+    const opts = (ctx.options?.configuration?.dnd ?? {}) as DndOptions
+    node.isDisabled = () => !!opts.readonly
   },
 }
 
 export default dnd
+export { DropPosition }
+export type { DndNode, DndOptions }

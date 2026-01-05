@@ -10,11 +10,11 @@
     "prefix": ""
   },
   "aliases": {
-    "components": ".vitepress/components",
-    "composables": ".vitepress/composables",
+    "components": ".vitepress/theme/components",
+    "composables": ".vitepress/theme/composables",
     "utils": "@/utils/shadcn",
-    "ui": ".vitepress/components/ui",
-    "lib": ".vitepress/utils"
+    "ui": ".vitepress/theme/components/ui",
+    "lib": ".vitepress/theme/utils"
   },
   "iconLibrary": "lucide"
 }

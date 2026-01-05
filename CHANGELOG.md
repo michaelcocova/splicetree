@@ -1,6 +1,67 @@
 # Changelog
 
 
+## v0.3.0 – 2026-01-05
+
+### @splicetree/plugin-dnd – 0.3.0
+
+### Minor Changes
+
+- 多节点拖拽增强：
+  - 当拖拽源节点属于当前选择集合时，启用“组拖拽”，保持被选节点的相对顺序。
+  - 悬停与释放阶段同时校验整组节点的 draggable / nestable / sortable 规则；任一节点不满足则整组操作禁用。
+  - 防止将节点拖入自身或其后代，确保结构合法性。
+  - 在 AFTER 场景按逆序处理，被选节点相对顺序保持正确。
+
+  影响与迁移：
+  - 若需要为部分节点放开“入内/前后排序”，请在 v-bind 拖拽行为中设置 nestable / sortable。
+
+### @splicetree/plugin-selectable – 0.3.0
+
+### Minor Changes
+
+- 选择行为优化：
+  - 普通点击在 multiple: true 时采用单选语义：清空其它选中，仅选中当前节点；若再次点击已选中节点则取消选中。
+  - ⌘/Ctrl + 点击 支持多选；Shift + 点击 支持范围选择。
+  - 示例已统一接入标准 onClick 事件，避免直接调用 toggleSelect 导致行为不一致。
+
+  影响与迁移：
+  - 若项目依赖旧的“普通点击追加选择”行为，请改为使用 ⌘/Ctrl + 点击 完成多选。
+
+---
+
+## v0.2.0 – 2025-12-25
+
+### @splicetree/core – 0.2.0
+
+### Minor Changes
+
+- ### @splicetree/core
+  - 新增 `syncData(next)`：同步数据源并刷新内部缓存与节点扩展
+  - 核心配置聚合到 `options.configuration`
+
+### @splicetree/plugin-pointer – 0.2.0
+
+### Minor Changes
+
+- chore: align pointer/selectable versions with other plugins
+
+### @splicetree/plugin-selectable – 0.2.0
+
+### Minor Changes
+
+- chore: align pointer/selectable versions with other plugins
+
+### @splicetree/adapter-vue – 0.2.0
+
+### Patch Changes
+
+- ### @splicetree/adapter-vue
+  - 在构建产物中将 `@splicetree/core` 标记为 external，避免被打包进适配器产物
+  - 当传入 `Ref` 数据源时，使用 core 的 `syncData(next)` 同步更新，避免重建实例导致插件交互失效
+
+---
+
 ## v0.2.0, v0.1.0 – 2025-12-24
 
 ### @splicetree/core – 0.2.0

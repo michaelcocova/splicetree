@@ -1,5 +1,13 @@
 # @splicetree/plugin-pointer
 
+## 0.3.0
+
+## 0.2.0
+
+### Minor Changes
+
+- chore: align pointer/selectable versions with other plugins
+
 ## 0.1.0
 
 ### Minor Changes

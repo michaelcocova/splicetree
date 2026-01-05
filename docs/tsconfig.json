@@ -8,6 +8,6 @@
     "declaration": true,
     "outDir": "dist"
   },
-  "include": ["src"],
+  "include": ["src", ".vitepress/theme/components/index.vue"],
   "exclude": ["dist", "node_modules"]
 }

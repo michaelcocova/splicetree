@@ -1,0 +1,16 @@
+{
+  "name": "@splicetree/cli",
+  "type": "module",
+  "version": "0.0.1",
+  "private": false,
+  "bin": {
+    "splicetree": "./index.mjs"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
+    "inquirer": "^9.2.12",
+    "ora": "^8.1.0"
+  }
+}

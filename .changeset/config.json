@@ -9,7 +9,9 @@
       "@splicetree/plugin-dnd",
       "@splicetree/plugin-keyboard",
       "@splicetree/plugin-lazy-load",
+      "@splicetree/plugin-pointer",
       "@splicetree/plugin-search",
+      "@splicetree/plugin-selectable",
       "@splicetree/adapter-vue"
     ]
   ],

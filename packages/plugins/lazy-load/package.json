@@ -1,7 +1,7 @@
 {
   "name": "@splicetree/plugin-lazy-load",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "email": "michael.cocova@gmail.com",
     "name": "Michael Cocova"
