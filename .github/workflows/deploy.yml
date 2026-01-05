@@ -41,7 +41,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Install dependencies
-        run: pnpm install # 安装依赖
+        run: pnpm install --no-frozen-lockfile # 安装依赖
       - name: Build with VitePress
         run: pnpm build:docs # 打包
       - name: Upload artifact
