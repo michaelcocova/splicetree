@@ -19,8 +19,8 @@
   },
   "scripts": {
     "cli": "node ./cli/index.mjs",
-    "dev:docs": "pnpm dev & pnpm run -F docs docs:dev",
-    "build:docs": "pnpm build && pnpm run -F docs docs:build",
+    "dev:docs": "pnpm -r run dev & pnpm run -F docs docs:dev",
+    "build:docs": "pnpm -r run build && pnpm run -F docs docs:build",
     "preview:docs": "pnpm run -F docs docs:preview",
     "changelog:aggregate": "node scripts/aggregate-changeset.js"
   },
