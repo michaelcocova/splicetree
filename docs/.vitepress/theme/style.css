@@ -175,3 +175,34 @@
   transform: none;
   @apply flex flex-col;
 }
+.vp-doc [class*='language-'] > button.copy.copied {
+  font-weight: 500;
+  border-color: oklch(72.3% 0.219 149.579);
+  background-color: oklch(96.2% 0.044 156.743) !important;
+}
+.vp-doc [class*='language-'] > button.copy {
+  width: max-content;
+  height: auto;
+  background-image: none !important;
+  font-size: 12px;
+  padding: 2px 6px;
+  display: flex;
+  zoom: 0.8;
+  border-radius: 4px !important;
+}
+.vp-doc [class*='language-'] > button.copy.copied::before {
+  display: none !important;
+}
+.vp-doc [class*='language-'] > button.copy::after {
+  content: '复制';
+  display: flex;
+}
+.vp-doc [class*='language-'] > button.copy.copied::after {
+  content: '已复制';
+  color: oklch(72.3% 0.219 149.579);
+  flex-wrap: nowrap;
+}
+
+.vp-doc [class*='language-'] code {
+  padding: 0 12px;
+}

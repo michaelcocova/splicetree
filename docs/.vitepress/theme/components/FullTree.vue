@@ -9,10 +9,8 @@ import selectable from '@splicetree/plugin-selectable'
 import { CheckSquare, ChevronRight, MinusSquare, Square } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
 import { cn } from '@/utils/shadcn'
-import { Kbd, KbdGroup } from './ui/kbd'
 
 const treeData = ref<SpliceTreeData[]>([
-
   { id: 'tropical', title: 'Tropical Fruits' },
 
   { id: 'banana', title: 'Banana', parent: 'tropical' },
@@ -93,12 +91,13 @@ const treeData = ref<SpliceTreeData[]>([
 const api = useSpliceTree(treeData, {
   plugins: [dnd, pointer, keyboard, selectable, checkable],
   configuration: {
+    defaultExpanded: ['berries', 'citrus'],
     keyboard: {
       autoListen: true,
       target: '.keyboard-wrap',
     },
     selectable: {
-      multiple: false,
+      multiple: true, // Allow multiple selection
     },
     checkable: {
       defaultChecked: [],
@@ -109,133 +108,109 @@ const api = useSpliceTree(treeData, {
       autoUpdateParent: true,
     },
   },
-  defaultExpanded: ['berries', 'citrus'],
 })
-const { items, dragProps, onClick } = api
+const { items, dragProps, onClick, ghostStyle } = api
+
 const keyboardRoot = ref<HTMLElement | null>(null)
+
 onMounted(() => {
   keyboardRoot.value?.focus()
-  const first = items.value?.[0]?.id
-  if (first) {
-    api.activeId = first
-  }
 })
 </script>
 
 <template>
-  <main data-example="tree" class="flex-1 min-h-full flex flex-col w-full rounded-lg divide-y border text-sm">
-    <header class="p-3 font-semibold">
-      交互式树 · 拖拽排序 · 勾选多选 · 键盘导航
-    </header>
-    <section ref="keyboardRoot" class="keyboard-wrap flex-1 flex flex-col gap-1 items-stretch overflow-auto p-2 outline-0 ring-0">
-      <div
-        v-for="item in items" :key="item.id"
-        :style="{ 'padding-left': `calc(var(--spacing) * 3 * ${item.level})` }"
-        v-bind="dragProps"
-        :data-id="item.id"
-        :class="cn('min-h-8 flex items-center gap-1 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100', {
-          'ring-[1px] ring-primary': item.isSelected(),
-        })"
-        :drop-position="item.getDropPosition() ?? '-2'"
-        @click="onClick(item.id, $event)"
+  <div class="max-w-xl mx-auto py-3">
+    <main data-example="tree" class="flex-1 min-h-full flex flex-col max-w-xl text-sm">
+      <header class="py-3 font-semibold">
+        交互式树 · 拖拽排序 · 勾选多选 · 键盘导航
+      </header>
+      <section
+        ref="keyboardRoot"
+        tabindex="0"
+        class="keyboard-wrap bg-white dark:bg-zinc-800 border rounded-md relative flex-1 flex flex-col gap-1 items-stretch overflow-auto p-2 outline-0 ring-0 focus-visible:ring-1 focus-visible:ring-primary"
       >
-        <button
-          :class="cn('transition-all rounded-full size-5 flex items-center justify-center hover:bg-zinc-200', { 'opacity-0': !item.hasChildren() })"
-          @click="item.toggleExpand()"
+        <!-- 拖拽占位元素：自动计算位置与尺寸 -->
+        <!-- 使用 ghostStyle({ padding: true, margin: true }) 确保占位符宽度自动减去容器内边距 -->
+        <div v-bind="ghostStyle({ padding: true, margin: true })" class="z-50 bg-primary/20 border-primary border-2 rounded" />
+
+        <div
+          v-for="item in items"
+          :key="item.id"
+          :style="{ 'margin-left': `calc(var(--spacing) * 3 * ${item.level})` }"
+          v-bind="dragProps(item.id)"
+          :data-id="item.id"
+          :class="cn(
+            'min-h-8 px-1 flex items-center gap-1 rounded relative cursor-pointer select-none transition-colors',
+            'hover:bg-zinc-100 dark:hover:bg-zinc-700/50',
+            {
+              'bg-primary/10 hover:bg-primary/15': item.isSelected(),
+              'ring-1 ring-primary/50': item.isSelected(),
+            },
+          )"
+          @click="onClick(item.id, $event)"
         >
-          <ChevronRight :class="cn('size-3.5 transition-transform duration-200', { 'rotate-90': item.isExpanded() })" />
-        </button>
-        <button
-          :class="cn('transition-all rounded size-5 flex items-center justify-center hover:bg-zinc-200')"
-          @click.stop="item.toggleCheck()"
-        >
-          <CheckSquare v-if="item.isChecked?.()" class="size-4 text-primary" />
-          <MinusSquare v-else-if="item.isIndeterminate?.()" class="size-4 text-primary" />
-          <Square v-else class="size-4" />
-        </button>
-        <label>
-          {{ item.original.title }}
-        </label>
+          <!-- 展开/收起按钮 -->
+          <button
+            :class="cn(
+              'rounded-full size-5 flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/10 transition-colors',
+              { 'opacity-0 pointer-events-none': !item.hasChildren() },
+            )"
+            @click.stop="item.toggleExpand()"
+          >
+            <ChevronRight
+              :class="cn('size-3.5 transition-transform duration-200', { 'rotate-90': item.isExpanded() })"
+            />
+          </button>
+
+          <!-- 勾选框 -->
+          <button
+            :class="cn(
+              'rounded size-5 flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/10 transition-colors mr-1',
+            )"
+            @click.stop="item.toggleCheck()"
+          >
+            <CheckSquare v-if="item.isChecked?.()" class="size-4 text-primary" />
+            <MinusSquare v-else-if="item.isIndeterminate?.()" class="size-4 text-primary" />
+            <Square v-else class="size-4 text-zinc-400" />
+          </button>
+
+          <!-- 节点内容 -->
+          <span class="truncate">
+            {{ item.original.title }}
+          </span>
+        </div>
+      </section>
+
+      <div class="text-zinc-500 flex flex-col items-start gap-1.5 text-xs py-3 mt-2 border-t">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <span class="flex items-center gap-1"><kbd class="bg-zinc-100 dark:bg-zinc-800 px-1 rounded border">↑</kbd> 上一个</span>
+          <span class="flex items-center gap-1"><kbd class="bg-zinc-100 dark:bg-zinc-800 px-1 rounded border">↓</kbd> 下一个</span>
+          <span class="flex items-center gap-1"><kbd class="bg-zinc-100 dark:bg-zinc-800 px-1 rounded border">←</kbd> 收起/父级</span>
+          <span class="flex items-center gap-1"><kbd class="bg-zinc-100 dark:bg-zinc-800 px-1 rounded border">→</kbd> 展开/子级</span>
+        </div>
+        <div>
+          <span class="font-medium">拖拽排序：</span>顶部线=前插；底部线=后插；中间高亮=成为子节点
+        </div>
+        <div>
+          <span class="font-medium">选择：</span>点击选中；<kbd>⌘/Ctrl</kbd>+点击 多选；<kbd>Shift</kbd>+点击 范围选择
+        </div>
+        <div>
+          <span class="font-medium">勾选：</span>点击方块勾选；父子状态自动关联
+        </div>
       </div>
-    </section>
-    <div class="text-zinc-600 flex flex-col items-start gap-1 text-xs p-2">
-      <KbdGroup class="flex items-center text-xs gap-2">
-        <Kbd>↑ 上一个</Kbd>
-        <div class="size-0.5 bg-zinc-500 rounded-lg" />
-        <Kbd>↓ 下一个</Kbd>
-        <div class="size-0.5 bg-zinc-500 rounded-lg" />
-        <Kbd>← 收起/聚焦父级</Kbd>
-        <div class="size-0.5 bg-zinc-500 rounded-lg" />
-        <Kbd>→ 展开/聚焦子级</Kbd>
-      </KbdGroup>
-      <div>拖拽排序：顶部线=前插；底部线=后插；中间高亮=成为子节点</div>
-      <div>选择：点击选中；⌘/Ctrl+点击 多选；Shift+点击 范围选择</div>
-      <div>勾选：点击左侧方块 勾选/取消；半选随子节点状态自动计算</div>
-    </div>
-  </main>
+    </main>
+  </div>
 </template>
 
-<style lang="css">
-[data-example='tree'] {
-  /* background: linear-gradient(to right, #22c1c3, #fdbb2d); */
-  background: linear-gradient(oklch(0.62 0.2 276.966) 30%, oklch(0.8 0.1 276.966));
-  padding: 2px;
-}
-[data-example='tree'] > header {
-  background: oklch(0.62 0.2 276.966);
-  color: #fff;
-}
-[data-example='tree'] > * {
-  background: #fff;
-}
-[data-example='tree'] > *:first-child {
-  border-radius: 8px 8px 0 0;
-}
-[data-example='tree'] > *:last-child {
-  border-radius: 0 0 8px 8px;
-}
-[data-example='tree'] > section {
-  min-height: 320px;
-  max-height: 320px;
-  overflow: hidden;
-  outline: 0;
-}
-[data-example='tree'] > [data-reka-scroll-area-viewport]:focus-visible {
-  outline: none !important;
-}
+<style lang="css" scoped>
+/* 键盘导航容器样式优化 */
 .keyboard-wrap {
-  scrollbar-width: none;
+  scrollbar-width: thin;
 }
 
-div[drop-position][draggable='true'] {
-  position: relative;
-}
-div[drop-position][draggable='true']::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  pointer-events: none;
-  display: none;
-}
-div[draggable='true'][drop-position='-1']::before {
-  top: 0;
-  height: 2px;
-  display: block;
-  background: var(--vp-code-color);
-}
-div[draggable='true'][drop-position='1']::before {
-  bottom: 0;
-  height: 2px;
-  background: var(--vp-code-color);
-  display: block;
-}
-div[draggable='true'][drop-position='0']::before {
-  top: 0;
-  bottom: 0;
-  background: var(--vp-code-color);
-  opacity: 0.15;
-  display: block;
-  border-radius: 4px;
+/* 简单的键盘按键样式 */
+kbd {
+  font-family: monospace;
+  font-size: 10px;
 }
 </style>

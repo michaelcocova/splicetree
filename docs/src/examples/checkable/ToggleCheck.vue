@@ -16,7 +16,7 @@ const { items } = useSpliceTree(treeData, {
       <div
         v-for="item in items"
         :key="item.id"
-        :style="{ 'padding-left': `calc(var(--spacing) * 3 * ${item.level})` }"
+        :style="{ 'margin-left': `calc(var(--spacing) * 3 * ${item.level})` }"
         :class="cn('min-h-8 flex items-center gap-2 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100')"
       >
         <button

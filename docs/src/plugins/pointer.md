@@ -27,10 +27,17 @@ button.addEventListener('click', (e) => {
 })
 ```
 
-## 事件
+## Events
 
-- `input:node-click: { nodeId: string, modifiers }`
-  - 仅派发语义事件；行为由 `selectable`、`checkable` 等插件消费
+| 事件               | 负载                                      | 说明                                 |
+| ------------------ | ----------------------------------------- | ------------------------------------ |
+| `input:node-click` | `{ nodeId: string, modifiers: Modifiers }`| 节点点击输入事件，供行为插件消费     |
+
+## 实例方法
+
+| 名称       | 参数                              | 说明                            |
+| ---------- | --------------------------------- | ------------------------------- |
+| `onClick`  | `nodeId: string, e: MouseEvent`   | 派发 `input:node-click` 事件    |
 
 ## 与其他插件配合
 

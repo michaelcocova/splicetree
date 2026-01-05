@@ -32,8 +32,8 @@ const { items, dragProps } = api
   <section class="keyboard-wrap flex flex-col gap-1 items-stretch overflow-auto p-2 outline-0 ring-0">
     <div
       v-for="item in items" :key="item.id"
-      :style="{ 'padding-left': `calc(var(--spacing) * 3 * ${item.level})` }"
-      v-bind="dragProps"
+      :style="{ 'margin-left': `calc(var(--spacing) * 3 * ${item.level})` }"
+      v-bind="dragProps(item.id)"
       :data-id="item.id"
       :class="cn('min-h-8 flex text-sm items-center gap-1 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100', { 'bg-zinc-100 dark:bg-zinc-800': item.isSelected?.() })"
       :drop-position="item.getDropPosition?.() ?? '-2'"
@@ -53,30 +53,33 @@ const { items, dragProps } = api
 </template>
 
 <style scoped>
-div[drop-position][draggable='true'] {
+div[drop-position] {
   position: relative;
 }
-div[drop-position][draggable='true']::before {
+div[drop-position]::before {
   content: '';
   position: absolute;
   left: 0;
   right: 0;
   pointer-events: none;
   display: none;
+  z-index: 1;
 }
-div[draggable='true'][drop-position='-1']::before {
-  top: 0;
+div[drop-position='-1']::before {
+  top: -1px;
   height: 2px;
   display: block;
   background: var(--vp-code-color);
+  border-radius: 2px;
 }
-div[draggable='true'][drop-position='1']::before {
-  bottom: 0;
+div[drop-position='1']::before {
+  bottom: -1px;
   height: 2px;
   background: var(--vp-code-color);
   display: block;
+  border-radius: 2px;
 }
-div[draggable='true'][drop-position='0']::before {
+div[drop-position='0']::before {
   top: 0;
   bottom: 0;
   background: var(--vp-code-color);

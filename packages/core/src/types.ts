@@ -5,6 +5,11 @@
  */
 export type Fn<T, D = undefined> = [D] extends [undefined] ? () => T : (data?: D) => T
 
+/** 可能是数组的类型 */
+export type MaybeArray<T> = T | T[]
+/** 可能是函数的类型 */
+export type MaybeFn<T, Args extends any[] = []> = T | ((...args: Args) => T)
+
 /**
  * 输入数据的通用结构
  * - 表示原始树数据的任意键值对对象

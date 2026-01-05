@@ -26,6 +26,12 @@ const tree = createSpliceTree(data, {
 })
 ```
 
+## Configuration
+
+| 选项                                      | 类型                                        | 默认值 | 说明                       |
+| ----------------------------------------- | ------------------------------------------- | ------ | -------------------------- |
+| `configuration.lazyLoad.loadChildren`     | `(node: SpliceTreeNode) => Promise<any[]>`  | `无`   | 异步加载并返回子节点数据   |
+
 ## 示例
 
 ### 基本懒加载
