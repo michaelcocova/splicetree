@@ -50,8 +50,6 @@ export async function runInteractivePublish() {
   const target = targetIndex === 1 ? 'npm' : 'local'
   const registry = target === 'local' ? 'http://localhost:4873/' : 'https://registry.npmjs.org/'
 
-  const dryRun = await askConfirm('是否 dry-run（默认是）？', true)
-
   const gitChecks = await askConfirm('是否 git-checks（默认否）？', false)
 
   if (shouldVersion) {
@@ -68,7 +66,7 @@ export async function runInteractivePublish() {
   if (shouldBuild) {
     for (const selected of selectedPkgs) {
       const pkgJsonPath = path.join(selected.dir, 'package.json')
-      const spinnerBuild = ora({ text: `构建 ${selected.name}@${selected.version} ...` }).start()
+      const spinnerBuild = ora({ text: `构建 ${selected.name}@${selected.version} ...\n\n` }).start()
       try {
         const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'))
         const hasBuildScript = pkgJson.scripts && Object.prototype.hasOwnProperty.call(pkgJson.scripts, 'build')
@@ -85,22 +83,17 @@ export async function runInteractivePublish() {
     }
   }
 
-  const args = ['publish', '--access', 'public', '--registry', registry]
-  if (dryRun) {
-    args.push('--dry-run')
+  const baseArgs = ['publish', '-r', '--access', 'public', '--registry', registry]
+  const filterArgs = []
+  for (const selected of selectedPkgs) {
+    filterArgs.push('--filter', selected.name)
   }
-  if (gitChecks) {
-    args.push('--git-checks')
-  } else {
-    args.push('--no-git-checks')
-  }
+  const publishArgs = [...baseArgs, ...filterArgs, ...(gitChecks ? ['--git-checks'] : ['--no-git-checks'])]
+  const dryRunArgs = [...baseArgs, ...filterArgs, '--dry-run', ...(gitChecks ? ['--git-checks'] : ['--no-git-checks'])]
 
   output.write(`\n${chalk.cyan('发布任务预览：')}\n`)
-  for (const selected of selectedPkgs) {
-    output.write(`  - ${chalk.green(selected.name)}@${selected.version}\n    pnpm ${args.join(' ')}  (cwd: ${path.relative(rootDir, selected.dir)})\n`)
-  }
-
-  // 预览中不包含 tag 信息
+  output.write(`  - 预跑（dry-run）：pnpm ${dryRunArgs.join(' ')}  (cwd: ${path.relative(rootDir, rootDir) || '.'})\n\n`)
+  output.write(`  - 正式发布：pnpm ${publishArgs.join(' ')}  (cwd: ${path.relative(rootDir, rootDir) || '.'})\n\n`)
 
   const ok = await askConfirm('确认执行以上发布任务吗？', true)
   if (!ok) {
@@ -108,14 +101,21 @@ export async function runInteractivePublish() {
     process.exit(0)
   }
 
-  for (const selected of selectedPkgs) {
-    const spinnerPublish = ora({ text: `正在发布 ${selected.name}@${selected.version} ...` }).start()
-    try {
-      await runCommand('pnpm', args, { cwd: selected.dir })
-      spinnerPublish.succeed(`发布成功 ${selected.name}@${selected.version}`)
-    } catch (error) {
-      spinnerPublish.fail(`发布失败 ${selected.name}@${selected.version}: ${error.message}`)
-      process.exit(1)
-    }
+  const spinnerDry = ora({ text: '预跑 dry-run 中...' }).start()
+  try {
+    await runCommand('pnpm', dryRunArgs, { cwd: rootDir })
+    spinnerDry.succeed('dry-run 完成')
+  } catch (error) {
+    spinnerDry.fail(`dry-run 失败：${error.message}`)
+    process.exit(1)
+  }
+
+  const spinnerPublish = ora({ text: '正在正式发布（递归 -r）...' }).start()
+  try {
+    await runCommand('pnpm', publishArgs, { cwd: rootDir })
+    spinnerPublish.succeed('发布完成')
+  } catch (error) {
+    spinnerPublish.fail(`发布失败：${error.message}`)
+    process.exit(1)
   }
 }

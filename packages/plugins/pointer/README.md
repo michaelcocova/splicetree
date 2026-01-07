@@ -23,14 +23,14 @@ const tree = createSpliceTree(data, {
 })
 
 // 在视图中调用
-// onClick(nodeId, e) 会派发 input:node-click 事件（包含修饰键）
-tree.onClick('a', mouseEvent)
+// inputNodeClick(nodeId, e) 会派发 input:node-click 事件（包含修饰键）
+tree.inputNodeClick('a', mouseEvent)
 ```
 
 ## Api
 
 - 事件派发
-  - `onClick(nodeId, e: MouseEvent)` 派发 `input:node-click`
+  - `inputNodeClick(nodeId, e: MouseEvent)` 派发 `input:node-click`
 - 事件负载
   - `nodeId: string`
   - `modifiers: { shift: boolean; ctrl: boolean; meta: boolean; alt: boolean }`

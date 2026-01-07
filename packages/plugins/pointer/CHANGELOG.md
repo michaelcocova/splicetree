@@ -1,5 +1,11 @@
 # @splicetree/plugin-pointer
 
+## 1.0.0
+
+### Major Changes
+
+- 重命名实例方法：`onClick` 更名为 `inputNodeClick`，与事件 `input:node-click` 保持一致的语义。请将调用更新为：`tree.inputNodeClick(nodeId, e)`；所有文档与示例已同步更新。此更改为不兼容更新。
+
 ## 0.3.0
 
 ## 0.2.0

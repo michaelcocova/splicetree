@@ -16,7 +16,7 @@ declare module '@splicetree/core' {
     }
   }
   export interface SpliceTreeInstance {
-    onClick: (nodeId: string, e: MouseEvent) => void
+    inputNodeClick: (nodeId: string, e: MouseEvent) => void
   }
 }
 
@@ -32,14 +32,14 @@ function getModifiers(e: MouseEvent) {
 export const pointerPlugin: SpliceTreePlugin = {
   name: 'pointer',
   setup(ctx: SpliceTreePluginContext) {
-    const onClick = (nodeId: string, e: MouseEvent) => {
+    const inputNodeClick = (nodeId: string, e: MouseEvent) => {
       ctx.events.emit({
         name: 'input:node-click',
         nodeId,
         modifiers: getModifiers(e),
       })
     }
-    return { onClick }
+    return { inputNodeClick }
   },
 }
 
