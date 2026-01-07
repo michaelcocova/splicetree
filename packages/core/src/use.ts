@@ -25,6 +25,7 @@ export function createSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
   const parentField = cfg.parentField ?? 'parent'
   const defaultExpanded = cfg.defaultExpanded
   const defaultExpandedLevel = cfg.defaultExpandedLevel
+  const autoExpandParent = cfg.autoExpandParent
   const events = createEmitter()
   const expandedKeys = createReactive(new Set<string>(), (payload) => {
     events.emit({ name: 'visibility', keys: Array.from(payload.target) })
@@ -32,7 +33,7 @@ export function createSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
 
   let { roots, map, parentCache, childrenCache } = buildTree<T>(data, keyField, parentField, expandedKeys)
 
-  initDefaultExpansion<T>(map, expandedKeys, defaultExpanded, defaultExpandedLevel)
+  initDefaultExpansion<T>(map, expandedKeys, defaultExpanded, defaultExpandedLevel, autoExpandParent)
 
   const emitVisibility = () => {
     events.emit({ name: 'visibility', keys: Array.from(expandedKeys) })

@@ -91,7 +91,8 @@ const treeData = ref<SpliceTreeData[]>([
 const api = useSpliceTree(treeData, {
   plugins: [dnd, pointer, keyboard, selectable, checkable],
   configuration: {
-    defaultExpanded: ['berries', 'citrus'],
+    autoExpandParent: true,
+    defaultExpanded: ['strawberry-cream'],
     keyboard: {
       autoListen: true,
       target: '.keyboard-wrap',

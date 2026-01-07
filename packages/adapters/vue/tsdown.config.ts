@@ -6,6 +6,6 @@ export default defineConfig({
   treeshake: true,
   unused: true,
   unbundle: false,
-  platform: 'neutral',
+  platform: 'browser',
   entry: ['./src/index.ts'],
 })

@@ -4,8 +4,6 @@
 [![GitHub](https://img.shields.io/static/v1?label=GitHub&message=splicetree%2Fsplicetree&logo=github)](https://github.com/michaelcocova/splicetree)
 [![License](https://img.shields.io/static/v1?label=License&message=MIT&color=success)](https://github.com/michaelcocova/splicetree/blob/main/LICENSE)
 
----
-
 ## 🔹 简介
 
 SpliceTree 是一个 无头（Headless）、框架无关的树形数据运行时，为现代 Web 应用提供灵活、高性能的树结构管理能力。
@@ -22,8 +20,6 @@ SpliceTree 是一个 无头（Headless）、框架无关的树形数据运行时
 - 勾选与半选
 - 键盘导航
 - 懒加载子节点
-
----
 
 ✨ 特性
 
@@ -54,19 +50,19 @@ SpliceTree 是一个 无头（Headless）、框架无关的树形数据运行时
 
 ## 🔹 插件与适配器总览
 
-| 名称                           | 功能         | 类型   |
-| ------------------------------ | ------------ | ------ |
-| `@splicetree/core`             | 核心运行时   | 核心   |
-| `@splicetree/adapter-vue`      | Vue 3 适配层 | 适配器 |
-| `@splicetree/plugin-checkable` | 勾选与半选   | 插件   |
-| `@splicetree/plugin-dnd`       | 拖拽移动节点 | 插件   |
-| `@splicetree/plugin-keyboard`  | 键盘导航     | 插件   |
-| `@splicetree/plugin-lazy-load` | 懒加载子节点 | 插件   |
-| `@splicetree/plugin-search`    | 搜索匹配     | 插件   |
+| 名称                            | 功能         | 类型   | Version                                                                                                                                                 | Downloads                                                                                                                                                     |
+| ------------------------------- | ------------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@splicetree/core`              | 核心运行时   | 核心   | [![version](https://img.shields.io/npm/v/@splicetree/core.svg?label=version)](https://www.npmjs.com/package/@splicetree/core)                           | [![downloads](https://img.shields.io/npm/dm/@splicetree/core.svg)](https://npmcharts.com/compare/%40splicetree%2Fcore?minimal=true)                           |
+| `@splicetree/adapter-vue`       | Vue 3 适配层 | 适配器 | [![version](https://img.shields.io/npm/v/@splicetree/adapter-vue.svg?label=version)](https://www.npmjs.com/package/@splicetree/adapter-vue)             | [![downloads](https://img.shields.io/npm/dm/@splicetree/adapter-vue.svg)](https://npmcharts.com/compare/%40splicetree%2Fadapter-vue?minimal=true)             |
+| `@splicetree/plugin-checkable`  | 勾选与半选   | 插件   | [![version](https://img.shields.io/npm/v/@splicetree/plugin-checkable.svg?label=version)](https://www.npmjs.com/package/@splicetree/plugin-checkable)   | [![downloads](https://img.shields.io/npm/dm/@splicetree/plugin-checkable.svg)](https://npmcharts.com/compare/%40splicetree%2Fplugin-checkable?minimal=true)   |
+| `@splicetree/plugin-dnd`        | 拖拽移动节点 | 插件   | [![version](https://img.shields.io/npm/v/@splicetree/plugin-dnd.svg?label=version)](https://www.npmjs.com/package/@splicetree/plugin-dnd)               | [![downloads](https://img.shields.io/npm/dm/@splicetree/plugin-dnd.svg)](https://npmcharts.com/compare/%40splicetree%2Fplugin-dnd?minimal=true)               |
+| `@splicetree/plugin-keyboard`   | 键盘导航     | 插件   | [![version](https://img.shields.io/npm/v/@splicetree/plugin-keyboard.svg?label=version)](https://www.npmjs.com/package/@splicetree/plugin-keyboard)     | [![downloads](https://img.shields.io/npm/dm/@splicetree/plugin-keyboard.svg)](https://npmcharts.com/compare/%40splicetree%2Fplugin-keyboard?minimal=true)     |
+| `@splicetree/plugin-lazy-load`  | 懒加载子节点 | 插件   | [![version](https://img.shields.io/npm/v/@splicetree/plugin-lazy-load.svg?label=version)](https://www.npmjs.com/package/@splicetree/plugin-lazy-load)   | [![downloads](https://img.shields.io/npm/dm/@splicetree/plugin-lazy-load.svg)](https://npmcharts.com/compare/%40splicetree%2Fplugin-lazy-load?minimal=true)   |
+| `@splicetree/plugin-search`     | 搜索匹配     | 插件   | [![version](https://img.shields.io/npm/v/@splicetree/plugin-search.svg?label=version)](https://www.npmjs.com/package/@splicetree/plugin-search)         | [![downloads](https://img.shields.io/npm/dm/@splicetree/plugin-search.svg)](https://npmcharts.com/compare/%40splicetree%2Fplugin-search?minimal=true)         |
+| `@splicetree/plugin-pointer`    | 指针输入     | 插件   | [![version](https://img.shields.io/npm/v/@splicetree/plugin-pointer.svg?label=version)](https://www.npmjs.com/package/@splicetree/plugin-pointer)       | [![downloads](https://img.shields.io/npm/dm/@splicetree/plugin-pointer.svg)](https://npmcharts.com/compare/%40splicetree%2Fplugin-pointer?minimal=true)       |
+| `@splicetree/plugin-selectable` | 选择与激活   | 插件   | [![version](https://img.shields.io/npm/v/@splicetree/plugin-selectable.svg?label=version)](https://www.npmjs.com/package/@splicetree/plugin-selectable) | [![downloads](https://img.shields.io/npm/dm/@splicetree/plugin-selectable.svg)](https://npmcharts.com/compare/%40splicetree%2Fplugin-selectable?minimal=true) |
 
 > 所有插件可按需组合使用，适配器仅为方便绑定 UI 组件，核心功能不依赖任何框架。
-
----
 
 ## 🔹 安装
 
@@ -76,15 +72,15 @@ pnpm add @splicetree/core
 pnpm add @splicetree/plugin-checkable @splicetree/plugin-dnd @splicetree/plugin-keyboard @splicetree/plugin-lazy-load @splicetree/plugin-search @splicetree/adapter-vue
 ```
 
-⸻
+### 🔹 快速开始（核心）
 
-### 🔹 快速开始
-
-核心 API 使用
+使用核心 API 构建树，并通过 configuration 定义默认展开与插件配置
 
 ```ts
 import { createSpliceTree } from '@splicetree/core'
-import pluginCheckable from '@splicetree/plugin-checkable'
+import checkable from '@splicetree/plugin-checkable'
+import pointer from '@splicetree/plugin-pointer'
+import selectable from '@splicetree/plugin-selectable'
 
 const data = [
   { id: 'a', label: '节点 A' },
@@ -92,13 +88,24 @@ const data = [
 ]
 
 const tree = createSpliceTree(data, {
-  defaultExpanded: ['a'],
-  plugins: [pluginCheckable()],
+  plugins: [checkable, pointer, selectable],
+  configuration: {
+    defaultExpanded: ['a'],
+    autoExpandParent: true,
+    checkable: {
+      defaultChecked: ['b'],
+      triggerByClick: false,
+    },
+    selectable: {
+      multiple: true,
+      defaultSelected: [],
+    },
+  },
 })
 
 // 遍历节点
 for (const node of tree.items()) {
-  console.log(node.id, node.level, node.checked)
+  console.log(node.id, node.level, node.isExpanded(), node.isSelected?.())
 }
 ```
 
@@ -106,15 +113,70 @@ for (const node of tree.items()) {
 
 ⸻
 
-### 🔹 插件开发指南
+### 🔹 Vue 3 集成
 
-- 插件应 可组合、类型安全、框架无关
-- 遵循 事件驱动 更新机制，避免直接操作视图
-- 插件命名：@splicetree/plugin-<name>
-- 默认导出插件常量，支持命名导出
-- 事件和节点扩展可通过 TypeScript 模块声明进行类型增强
+通过适配器将核心运行时与 Vue 绑定，items 以 shallowRef 暴露；点击节点时调用 inputNodeClick 产生语义事件。
 
-完整文档请参阅 插件开发规范￼
+```ts
+import { useSpliceTree } from '@splicetree/adapter-vue'
+import keyboard from '@splicetree/plugin-keyboard'
+import pointer from '@splicetree/plugin-pointer'
+import selectable from '@splicetree/plugin-selectable'
+import { ref } from 'vue'
+
+const data = ref([
+  { id: 'a', label: '节点 A' },
+  { id: 'b', label: '节点 B', parent: 'a' },
+])
+
+const tree = useSpliceTree(data, {
+  plugins: [pointer, selectable, keyboard],
+  configuration: {
+    defaultExpanded: ['a'],
+    autoExpandParent: true,
+    selectable: { multiple: true },
+    keyboard: { autoListen: true, target: '.keyboard-wrap' },
+  },
+})
+
+// 在模板中：
+// <div class="keyboard-wrap">
+//   <div v-for="n in tree.items" :key="n.id" @click="tree.inputNodeClick(n.id, $event)">
+//     {{ n.original.label }}
+//   </div>
+// </div>
+```
+
+⸻
+
+### 🔹 CLI 使用
+
+根目录提供交互式 CLI，统一进行构建、版本与发布等工作：
+
+- 运行：pnpm run cli
+- 主菜单：
+  - Build
+  - Dev
+  - Version Packages
+  - Publish（交互式发布，支持多选，默认全选）
+  - Clean
+  - Changelog
+  - Lint
+- 发布流程要点：
+  - 可选择“是否执行 version-packages（默认否）”，选择“是”将执行 changeset version
+  - 支持设置 NPM_TOKEN（可留空，自动读取 .env/.env.local）
+  - 支持选择发布到本地 Verdaccio（默认 http://localhost:4873/）或 npm
+  - 强制在正式发布前执行一次 dry-run
+  - 递归 -r 发布并按所选包添加 --filter
+  - git-checks 默认关闭，可在交互中开启
+
+⸻
+
+### 🔹 发布与变更记录
+
+- 版本变更：pnpm run version-packages
+- 根目录聚合 Changelog：pnpm run changelog:aggregate（脚本位置见 scripts/aggregate-changeset.js）
+- 交互式发布：pnpm run cli → 选择 Publish
 
 ⸻
 

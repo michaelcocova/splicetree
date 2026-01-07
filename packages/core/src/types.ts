@@ -129,6 +129,7 @@ export interface SpliceTreeConfiguration {
    * 设为 'deepest' 表示默认展开所有层级
    */
   defaultExpandedLevel?: number | 'deepest'
+  autoExpandParent?: boolean
 }
 
 export interface UseSpliceTreeOptions<T = SpliceTreeData> {

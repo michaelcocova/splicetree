@@ -1,7 +1,7 @@
 {
   "name": "@splicetree/adapter-vue",
   "type": "module",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "author": {
     "email": "michael.cocova@gmail.com",
     "name": "Michael Cocova"
@@ -29,13 +29,12 @@
   "peerDependencies": {
     "vue": "^3.0.0"
   },
-  "dependencies": {
-    "unplugin-vue": "^7.1.0",
-    "vue-tsc": "^3.1.5"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@splicetree/core": "workspace:*",
-    "vue": "^3.0.0"
+    "unplugin-vue": "^7.1.0",
+    "vue": "^3.0.0",
+    "vue-tsc": "^3.1.5"
   },
   "publishConfig": {
     "access": "public"

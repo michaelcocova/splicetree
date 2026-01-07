@@ -37,7 +37,7 @@ const { items, dragProps } = api
       :data-id="item.id"
       :class="cn('min-h-8 flex text-sm items-center gap-1 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100', { 'bg-zinc-100 dark:bg-zinc-800': item.isSelected?.() })"
       :drop-position="item.getDropPosition?.() ?? '-2'"
-      @click="api.onClick(item.id, $event)"
+      @click="api.inputNodeClick(item.id, $event)"
     >
       <button
         :class="cn('ml-1 transition-all rounded-full size-5 flex items-center justify-center hover:bg-zinc-200', { 'opacity-0': !item.hasChildren() })"

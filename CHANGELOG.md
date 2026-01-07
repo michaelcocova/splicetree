@@ -1,6 +1,22 @@
 # Changelog
 
 
+## v1.0.0 – 2026-01-07
+
+### @splicetree/core – 1.0.0
+
+### Minor Changes
+
+- 添加配置项 `autoExpandParent`：当开启时，`configuration.defaultExpanded` 中的每个节点将递归展开其所有父节点（祖先链）。例如：`defaultExpanded: ['strawberry-cream']` 与 `autoExpandParent: true` 将最终展开 `['berries', 'strawberry', 'strawberry-cream']`。
+
+### @splicetree/plugin-pointer – 1.0.0
+
+### Major Changes
+
+- 重命名实例方法：`onClick` 更名为 `inputNodeClick`，与事件 `input:node-click` 保持一致的语义。请将调用更新为：`tree.inputNodeClick(nodeId, e)`；所有文档与示例已同步更新。此更改为不兼容更新。
+
+---
+
 ## v0.3.0 – 2026-01-05
 
 ### @splicetree/plugin-dnd – 0.3.0

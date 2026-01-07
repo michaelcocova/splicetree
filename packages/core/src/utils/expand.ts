@@ -5,6 +5,7 @@ export function initDefaultExpansion<T extends SpliceTreeData>(
   expanded: Set<string>,
   def: true | string[] | undefined,
   lvl: number | 'deepest' | undefined,
+  autoExpandParent?: boolean,
 ) {
   const expandAll = () => {
     for (const id of map.keys()) {
@@ -25,6 +26,17 @@ export function initDefaultExpansion<T extends SpliceTreeData>(
   if (Array.isArray(def)) {
     for (const id of def) {
       expanded.add(id)
+      if (autoExpandParent) {
+        let cur = map.get(id)
+        while (cur) {
+          const p = cur.getParent()
+          if (!p) {
+            break
+          }
+          expanded.add(p.id)
+          cur = p
+        }
+      }
     }
     if (lvl === 'deepest') {
       expandAll()
