@@ -14,6 +14,23 @@ import { onMounted } from 'vue'
 import { ChromeFrame } from './chrome-frame'
 import FullTree from './FullTree.vue'
 
+const pkgs = [
+  { key: '@splicetree/core', desc: '核心运行时' },
+  { key: '@splicetree/adapter-vue', desc: 'Vue 3 适配层' },
+  { key: '@splicetree/plugin-checkable', desc: '勾选与半选' },
+  { key: '@splicetree/plugin-dnd', desc: '拖拽移动节点' },
+  { key: '@splicetree/plugin-keyboard', desc: '键盘导航  ' },
+  { key: '@splicetree/plugin-lazy-load', desc: '懒加载子节点' },
+  { key: '@splicetree/plugin-search', desc: '搜索匹配  ' },
+  { key: '@splicetree/plugin-pointer', desc: '指针输入  ' },
+  { key: '@splicetree/plugin-selectable', desc: '选择与激活' },
+]
+function versionUrl(pkgKey: string) {
+  return `https://img.shields.io/npm/v/${pkgKey}.svg?label=&color=00c951`
+}
+function downloadUrl(pkgKey: string) {
+  return `https://img.shields.io/npm/dm/${pkgKey}.svg?label=&color=4f39f6`
+}
 onMounted(() => {
   window.scrollTo(0, 0) // 强制滚动到页面顶部
 })
@@ -29,14 +46,12 @@ onMounted(() => {
     <main class="container mx-auto py-16 md:py-24 max-w-7xl flex flex-col items-center gap-16">
       <!-- Hero Section -->
       <section class="flex flex-col items-center text-center gap-8 max-w-4xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <div class="inline-flex items-center rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 px-3 py-1 text-sm text-zinc-600 dark:text-zinc-400 backdrop-blur-sm">
-          <span class="flex h-2 w-2 rounded-full bg-green-500 mr-2 animate-pulse" />
-          v0.2.0 已发布
-        </div>
-
         <h1 class="text-5xl md:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400">
           Build Better Trees, <br class="hidden md:block">
-          <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-600 dark:from-blue-400 dark:to-violet-400">Faster.</span>
+          <span class="relative bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-600 dark:from-blue-400 dark:to-violet-400">
+            Faster.
+            <img class=" absolute right-0 inline-block  rounded-lg overflow-hidden" src="https://img.shields.io/npm/v/@splicetree/core.svg?label=&color=00c951">
+          </span>
         </h1>
 
         <p class="text-xl md:text-2xl text-zinc-600 dark:text-zinc-400 leading-relaxed max-w-2xl">
@@ -95,6 +110,45 @@ onMounted(() => {
         <p class="text-center text-sm text-zinc-400 mt-4">
           👆 这是一个完全交互式的示例：尝试拖拽、多选、键盘操作
         </p>
+      </section>
+
+      <section class="w-full max-w-6xl animate-in fade-in slide-in-from-bottom-12 duration-1000">
+        <div class="overflow-x-auto bg-white dark:bg-zinc-900">
+          <div class="min-w-full divide-y divide-zinc-100 dark:divide-zinc-800">
+            <div class="grid grid-cols-6 border-b border-b-zinc-200 text-zinc-600 dark:text-zinc-400 [&_div]:px-4 [&_div]:py-3 [&_div]:font-medium">
+              <div class="col-span-2">
+                名称
+              </div>
+              <div class="col-span-2">
+                功能
+              </div>
+              <div>
+                Version
+              </div>
+              <div>
+                Downloads
+              </div>
+            </div>
+            <div
+              v-for="p in pkgs"
+              :key="p.key"
+              class="grid grid-cols-6 last:border-b last:border-b-zinc-200 last:dark:border-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-900/30 [&_div]:px-4 [&_div]:py-3"
+            >
+              <div class="col-span-2 font-mono text-zinc-900 dark:text-zinc-200">
+                {{ p.key }}
+              </div>
+              <div class="col-span-2 text-zinc-700 dark:text-zinc-300">
+                {{ p.desc }}
+              </div>
+              <div>
+                <img :src="versionUrl(p.key)" class="h-5">
+              </div>
+              <div>
+                <img :src="downloadUrl(p.key)" class="h-5">
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- Features Grid -->
