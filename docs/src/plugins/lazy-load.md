@@ -10,7 +10,7 @@
 
 ```ts
 import { createSpliceTree } from '@splicetree/core'
-import { lazyLoad } from '@splicetree/lazy-load'
+import lazyLoad from '@splicetree/plugin-lazy-load'
 
 const tree = createSpliceTree(data, {
   plugins: [lazyLoad],
@@ -50,17 +50,20 @@ const tree = createSpliceTree(data, {
 
 ### 实例方法
 
-| 名称                | 参数                      | 说明                       |
-| ------------------- | ------------------------- | -------------------------- |
-| `loadedKeys`        | `无`                      | 已加载集合                 |
-| `isLoaded(id)`      | `id: string`              | 是否已加载                 |
-| `load(id)`          | `id: string`              | 手动加载                   |
-| `expand(ids)`       | `ids: string \| string[]` | 覆盖：未加载时先加载再展开 |
-| `toggleExpand(ids)` | `ids: string \| string[]` | 覆盖：未加载时先加载再切换 |
+| 名称                | 参数                      | 说明                         |
+| ------------------- | ------------------------- | ---------------------------- |
+| `loadedKeys`        | `无`                      | 已加载集合                   |
+| `loadingKeys`       | `无`                      | 加载中的集合                 |
+| `isLoaded(id)`      | `id: string`              | 是否已加载                   |
+| `isLoading(id)`     | `id: string`              | 是否正在加载                 |
+| `load(id)`          | `id: string`              | 手动加载                     |
+| `expand(ids)`       | `ids: string \| string[]` | 覆盖：未加载时先加载再展开   |
+| `toggleExpand(ids)` | `ids: string \| string[]` | 覆盖：未加载时先加载再切换   |
 
 ### 节点方法
 
 | 名称            | 参数 | 说明                                          |
 | --------------- | ---- | --------------------------------------------- |
 | `isLoaded()`    | `无` | 当前节点是否已加载                            |
+| `isLoading()`   | `无` | 当前节点是否正在加载                          |
 | `hasChildren()` | `无` | 重写：未加载返回 `true`，加载后根据子节点判断 |
