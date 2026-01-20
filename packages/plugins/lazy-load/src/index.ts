@@ -19,7 +19,9 @@ declare module '@splicetree/core' {
   /**
    * 实例扩展（Lazy-Load）
    * - loadedKeys：已加载集合
+   * - loadingKeys：加载中的集合
    * - isLoaded：查询是否已加载
+   * - isLoading：查询是否正在加载
    * - load：加载指定节点的子节点
    */
   interface SpliceTreeInstance {
@@ -28,9 +30,17 @@ declare module '@splicetree/core' {
      */
     loadedKeys: Set<string>
     /**
+     * 正在加载的节点 id 集合
+     */
+    loadingKeys: Set<string>
+    /**
      * 查询指定节点是否已完成子节点加载
      */
     isLoaded: (id: string) => boolean
+    /**
+     * 查询指定节点是否正在加载
+     */
+    isLoading: (id: string) => boolean
     /**
      * 加载指定节点的子节点并追加到树中
      * @param id 目标节点 id
@@ -44,6 +54,7 @@ declare module '@splicetree/core' {
    */
   interface SpliceTreeNode {
     isLoaded: () => boolean
+    isLoading: () => boolean
   }
 }
 
@@ -61,7 +72,9 @@ export const lazyLoad: SpliceTreePlugin = {
     }
     const { loadChildren } = cfg
     const loadedKeys = new Set<string>()
+    const loadingKeys = new Set<string>()
     const isLoaded = (id: string) => loadedKeys.has(id)
+    const isLoading = (id: string) => loadingKeys.has(id)
 
     /**
      * 为节点应用懒加载相关的覆盖方法
@@ -70,6 +83,7 @@ export const lazyLoad: SpliceTreePlugin = {
      */
     const applyLazyOverrides = (node: any) => {
       node.isLoaded = () => ctx.tree.isLoaded?.(node.id)
+      node.isLoading = () => ctx.tree.isLoading?.(node.id)
       node.hasChildren = () => {
         const loaded = ctx.tree.isLoaded?.(node.id)
         if (!loaded) {
@@ -97,6 +111,11 @@ export const lazyLoad: SpliceTreePlugin = {
       if (!node) {
         return
       }
+      if (loadingKeys.has(id)) {
+        return
+      }
+      loadingKeys.add(id)
+      ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
       const children = await loadChildren(node)
       if (children?.length) {
         ctx.tree.appendChildren(id, children)
@@ -109,6 +128,8 @@ export const lazyLoad: SpliceTreePlugin = {
         }
       }
       loadedKeys.add(id)
+      loadingKeys.delete(id)
+      ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
       ctx.events.emit({ name: 'lazyload', keys: Array.from(loadedKeys) })
     }
 
@@ -148,7 +169,9 @@ export const lazyLoad: SpliceTreePlugin = {
 
     return {
       loadedKeys,
+      loadingKeys,
       isLoaded,
+      isLoading,
       load,
       expand,
       toggleExpand,
@@ -161,6 +184,7 @@ export const lazyLoad: SpliceTreePlugin = {
    */
   extendNode(node, ctx) {
     node.isLoaded = () => ctx.tree.isLoaded?.(node.id)
+    node.isLoading = () => ctx.tree.isLoading?.(node.id)
     node.hasChildren = () => {
       const loaded = ctx.tree.isLoaded?.(node.id)
       if (!loaded) {
