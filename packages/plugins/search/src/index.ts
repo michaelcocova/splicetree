@@ -4,7 +4,7 @@ import '@splicetree/core'
 declare module '@splicetree/core' {
   export interface SpliceTreeConfiguration {
     search?: {
-      matcher?: (node: SpliceTreeNode<any>, query: string) => boolean
+      method?: (node: SpliceTreeNode<any>, keyword: string) => boolean
     }
   }
 
@@ -19,7 +19,6 @@ declare module '@splicetree/core' {
   /**
    * 实例扩展（Search）
    * - matchedKeys：匹配集合
-   * - isMatched：查询是否匹配
    * - search：执行搜索
    */
   interface SpliceTreeInstance {
@@ -28,27 +27,13 @@ declare module '@splicetree/core' {
      */
     matchedKeys: Set<string>
     /**
-     * 查询指定节点是否命中当前搜索
-     */
-    isMatched: (id: string) => boolean
-    /**
      * 执行搜索并更新匹配集合
      * @param query 查询串
      */
     search: (query: string) => void
   }
 
-  /**
-   * 节点扩展（Search）
-   * - isMatched：当前节点是否匹配
-   */
-  interface SpliceTreeNode {
-    /**
-     * 当前节点是否匹配当前搜索
-     * @returns true 表示匹配
-     */
-    isMatched: () => boolean
-  }
+  // 节点不再扩展 isMatched
 }
 
 export const search: SpliceTreePlugin = {
@@ -61,21 +46,14 @@ export const search: SpliceTreePlugin = {
    */
   setup(ctx: SpliceTreePluginContext) {
     const cfg = (ctx.options?.configuration?.search ?? {}) as {
-      matcher?: (node: SpliceTreeNode<any>, query: string) => boolean
+      method?: (node: SpliceTreeNode<any>, keyword: string) => boolean
     }
-    const { matcher } = cfg
+    const { method } = cfg
     const matchedKeys = new Set<string>()
-    const isMatched = (id: string) => matchedKeys.has(id)
-
-    /**
-     * 默认匹配器：按节点数据的 JSON 字符串执行包含匹配（大小写不敏感）
-     * @param node 节点
-     * @param q 查询串
-     */
-    const defaultMatcher = (node: any, q: string) => {
-      const str = JSON.stringify(node.original ?? node).toLowerCase()
-      return str.includes(q.toLowerCase())
-    }
+    let prevExpanded: string[] | null = null
+    let currentQuery = ''
+    const ancestorSet = new Set<string>()
+    const origItems = ctx.tree.items.bind(ctx.tree)
 
     /**
      * 执行搜索：清空旧结果，按 items() 的可见节点进行匹配与标记
@@ -86,33 +64,76 @@ export const search: SpliceTreePlugin = {
      */
     const search = (query: string) => {
       matchedKeys.clear()
+      ancestorSet.clear()
+      currentQuery = query
       if (!query) {
+        if (prevExpanded) {
+          ctx.tree.collapseAll()
+          ctx.tree.expand(prevExpanded)
+          prevExpanded = null
+        }
+        ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
         ctx.events.emit({ name: 'search', keys: [], query })
         return
       }
-      const items = ctx.tree.items()
+      if (!method) {
+        console.warn('[@splicetree/plugin-search] 请提供 configuration.search.method(node, keyword)')
+        return
+      }
+      if (!prevExpanded) {
+        prevExpanded = ctx.tree.expandedKeys()
+      }
+      ctx.tree.expandAll()
+      const items = origItems()
+      ancestorSet.clear()
       for (const n of items) {
-        const ok = matcher ? matcher(n, query) : defaultMatcher(n, query)
+        const ok = method!(n, query)
         if (ok) {
           matchedKeys.add(n.id)
+          let p = n.getParent()
+          while (p) {
+            ancestorSet.add(p.id)
+            p = p.getParent()
+          }
         }
       }
+      // 仅展开命中的祖先链，收起其它分支
+      ctx.tree.collapseAll()
+      if (ancestorSet.size > 0) {
+        ctx.tree.expand(Array.from(ancestorSet))
+      }
+      ctx.events.emit({ name: 'visibility', keys: ctx.tree.expandedKeys() })
       ctx.events.emit({ name: 'search', keys: Array.from(matchedKeys), query })
     }
 
     return {
       matchedKeys,
-      isMatched,
       search,
+      // 过滤不可见项：仅保留命中节点及其祖先链
+      items: () => {
+        const list = origItems()
+        if (!currentQuery) {
+          return list
+        }
+        const keep = new Set<string>(matchedKeys)
+        // 合并祖先链
+        for (const id of ancestorSet) {
+          keep.add(id)
+        }
+        for (const n of list) {
+          if (keep.has(n.id)) {
+            let p = n.getParent()
+            while (p) {
+              keep.add(p.id)
+              p = p.getParent()
+            }
+          }
+        }
+        return list.filter(n => keep.has(n.id))
+      },
     }
   },
-  /**
-   * 为节点扩展匹配态判断方法
-   * - isMatched：当前节点是否匹配当前查询
-   */
-  extendNode(node, ctx) {
-    node.isMatched = () => ctx.tree.isMatched(node.id)
-  },
+  // 不再为节点扩展 isMatched
 }
 
 export default search

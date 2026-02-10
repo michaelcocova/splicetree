@@ -1,5 +1,13 @@
 # @splicetree/plugin-dnd
 
+## 2.0.0
+
+### Minor Changes
+
+- 拖拽插件增强：
+  - 新增 `configuration.dnd.handle`：仅在指定句柄元素上允许拖拽（如 `.handle`）；未设置时整个节点可拖拽
+  - 新增 `configuration.dnd.color`：统一占位（ghost）颜色配置
+
 ## 1.1.0
 
 ## 1.0.0

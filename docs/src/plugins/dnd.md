@@ -28,11 +28,28 @@ const { dragProps, ghostStyle } = tree
 
 ### 基本拖拽 + 统一占位（ghost）
 
-<demo vue="../../examples/dnd/Basic.vue" />
+<demo vue="../examples/dnd/Basic.vue" />
+
+### 句柄拖拽（handle）
+
+只在指定的句柄元素上允许拖拽，未设置时整行可拖拽。
+
+```ts
+createSpliceTree(data, {
+  plugins: [dnd],
+  configuration: {
+    dnd: {
+      handle: '.handle', // 仅 .handle 元素上可触发拖拽
+    },
+  },
+})
+```
+
+<demo vue="../examples/dnd/Handle.vue" />
 
 ### 禁止更新父字段
 
-<demo vue="../../examples/dnd/NoAutoUpdate.vue" />
+<demo vue="../examples/dnd/NoAutoUpdate.vue" />
 
 ::: tip 禁止更新父字段需要您手动处理移动
 
@@ -60,25 +77,25 @@ events.on('move', ({ id, parentId, beforeId }) => {
 
 ### 禁止拖入后自动展开
 
-<demo vue="../../examples/dnd/NoAutoExpand.vue" />
+<demo vue="../examples/dnd/NoAutoExpand.vue" />
 
 ### 只读模式
 
-<demo vue="../../examples/dnd/Readonly.vue" />
+<demo vue="../examples/dnd/Readonly.vue" />
 
 ### 按节点行为覆盖
 
 #### 禁拖拽源
 
-<demo vue="../../examples/dnd/BehaviorDraggable.vue" />
+<demo vue="../examples/dnd/BehaviorDraggable.vue" />
 
 #### 拖这个节点：不能排到其它节点前后
 
-<demo vue="../../examples/dnd/BehaviorSortable.vue" />
+<demo vue="../examples/dnd/BehaviorSortable.vue" />
 
 #### 拖这个节点：不能进其它节点里面
 
-<demo vue="../../examples/dnd/BehaviorNestable.vue" />
+<demo vue="../examples/dnd/BehaviorNestable.vue" />
 
 > 说明：这些设置说的是“被你拖的那个节点能不能做事”。比如 `nestable: false` 就是“拖这个节点，不能进其它节点里面”。不影响目标愿不愿意接收。
 
@@ -86,11 +103,13 @@ events.on('move', ({ id, parentId, beforeId }) => {
 
 ### Configuration（简化）
 
-| 选项                                 | 类型      | 默认值  | 说明                                 |
-| ------------------------------------ | --------- | ------- | ------------------------------------ |
-| `configuration.dnd.autoUpdateParent` | `boolean` | `true`  | 是否在 `onDrop` 时执行实际移动与写回 |
-| `configuration.dnd.autoExpandOnDrop` | `boolean` | `true`  | 拖入后自动展开目标节点               |
-| `configuration.dnd.readonly`         | `boolean` | `false` | 全局只读，禁止所有拖拽与排序         |
+| 选项                                 | 类型      | 默认值    | 说明                                 |
+| ------------------------------------ | --------- | --------- | ------------------------------------ |
+| `configuration.dnd.autoUpdateParent` | `boolean` | `true`    | 是否在 `onDrop` 时执行实际移动与写回 |
+| `configuration.dnd.autoExpandOnDrop` | `boolean` | `true`    | 拖入后自动展开目标节点               |
+| `configuration.dnd.readonly`         | `boolean` | `false`   | 全局只读，禁止所有拖拽与排序         |
+| `configuration.dnd.color`            | `string`  | `#4224da` | 统一占位（ghost）指示颜色            |
+| `configuration.dnd.handle`           | `string`  | `无`      | 仅允许在句柄元素上拖拽（例如 `.handle`） |
 
 ### Events
 

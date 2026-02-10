@@ -1,5 +1,14 @@
 # @splicetree/adapter-vue
 
+## 2.0.0
+
+### Minor Changes
+
+- Vue 适配器增强：暴露 `selectedKeys` 为响应式 `ShallowRef<string[]>`，并保留原始 `Set` 于 `selectedKeysSet`。
+  - 监听核心的 `visibility` 事件，同步 `items` 与 `selectedKeys`。
+  - 无需在应用层手动订阅事件更新选择集合。
+  - 向后兼容：原有插件的 `selectedKeys: Set<string>` 仍可通过 `selectedKeysSet` 访问。
+
 ## 1.1.0
 
 ## 1.0.0

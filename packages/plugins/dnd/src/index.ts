@@ -43,8 +43,12 @@ declare module '@splicetree/core' {
     dragProps: (id: string, behavior?: DragBehavior) => {
       /** 是否可拖拽 */
       draggable: boolean
+      /** 鼠标按下，用于句柄检测 */
+      onMousedown: (e: MouseEvent) => void
       /** 原生拖拽开始事件处理 */
       onDragstart: (e: DragEvent) => void
+      /** 原生拖拽结束事件处理 */
+      onDragend: (e: DragEvent) => void
       /** 原生拖拽悬停事件处理 */
       onDragover: (e: DragEvent) => void
       /** 原生拖拽离开事件处理 */
@@ -85,6 +89,9 @@ export const dnd: SpliceTreePlugin = {
       autoUpdateParent = true,
       readonly = false,
     } = opts
+    const color = opts.color ?? '#4224da'
+    const handleSelector = opts.handle
+    const handleActive = new Set<string>()
     const parentField = ctx.tree.options?.configuration?.parentField ?? 'parent'
     let draggingId: string | undefined
     const hoverPositions = new Map<string, DropPosition>()
@@ -364,11 +371,30 @@ export const dnd: SpliceTreePlugin = {
       const canDrag = behavior?.draggable === false ? false : !isDisabledById(id)
       return {
         draggable: canDrag,
+        onMousedown: (e: MouseEvent) => {
+          if (!handleSelector) return
+          const path = (e as any).composedPath?.() as Element[] | undefined
+          const allowed = path?.some(el => (el as Element)?.matches?.(handleSelector)) ?? false
+          if (allowed) {
+            handleActive.add(id)
+          } else {
+            handleActive.delete(id)
+          }
+        },
         onDragstart: (e: DragEvent) => {
           if (canDrag) {
+            if (handleSelector) {
+              if (!handleActive.has(id)) {
+                e.preventDefault()
+                return
+              }
+            }
             e.dataTransfer?.setData('text/plain', id)
             onDragStart(id)
           }
+        },
+        onDragend: (_e: DragEvent) => {
+          handleActive.delete(id)
         },
         onDragover: (e: DragEvent) => {
           e.preventDefault()
@@ -381,6 +407,7 @@ export const dnd: SpliceTreePlugin = {
         onDrop: (e: DragEvent) => {
           e.preventDefault()
           onDrop(id)
+          handleActive.delete(id)
         },
       }
     }
@@ -399,12 +426,12 @@ export const dnd: SpliceTreePlugin = {
       const right = `${rightInset + rightMargin}px`
       const base: Record<string, any> = { position: 'absolute', left, right, pointerEvents: 'none' }
       if (ghostPos === DropPosition.BEFORE) {
-        return { 'style': { ...base, top: `${ghostTop}px`, height: '2px', background: 'var(--vp-code-color)', borderRadius: '2px' }, 'data-drop-position': -1 }
+        return { 'style': { ...base, top: `${ghostTop}px`, height: '2px', background: color, borderRadius: '2px' }, 'data-drop-position': -1 }
       }
       if (ghostPos === DropPosition.AFTER) {
-        return { 'style': { ...base, top: `${ghostTop + ghostHeight}px`, height: '2px', background: 'var(--vp-code-color)', borderRadius: '2px' }, 'data-drop-position': 1 }
+        return { 'style': { ...base, top: `${ghostTop + ghostHeight}px`, height: '2px', background: color, borderRadius: '2px' }, 'data-drop-position': 1 }
       }
-      return { 'style': { ...base, top: `${ghostTop}px`, height: `${ghostHeight}px`, background: 'var(--vp-code-color)', opacity: 0.15, borderRadius: '4px' }, 'data-drop-position': 0 }
+      return { 'style': { ...base, top: `${ghostTop}px`, height: `${ghostHeight}px`, background: color, opacity: 0.15, borderRadius: '4px' }, 'data-drop-position': 0 }
     }
 
     return {

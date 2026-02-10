@@ -4,7 +4,7 @@ import dnd from '@splicetree/plugin-dnd'
 import { ChevronRight } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { cn } from '@/utils/shadcn'
-import { treeData } from './data'
+import { treeData } from '../data'
 
 const data = ref(treeData)
 const ROOTS = ['tropical', 'berries', 'citrus', 'stone-fruits', 'melon']

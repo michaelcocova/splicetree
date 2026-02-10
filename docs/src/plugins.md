@@ -3,7 +3,7 @@
 | 插件 / 适配器                   | 功能               | 文档链接                   |
 | ------------------------------- | ------------------ | -------------------------- |
 | `@splicetree/plugin-checkable`  | 勾选能力（含半选） | [查看](plugins/checkable)  |
-| `@splicetree/plugin-dnd`        | 拖拽移动节点       | [查看](/plugins/dnd/)      |
+| `@splicetree/plugin-dnd`        | 拖拽移动节点       | [查看](/plugins/dnd)       |
 | `@splicetree/plugin-keyboard`   | 键盘输入采集       | [查看](plugins/keyboard)   |
 | `@splicetree/plugin-pointer`    | 点击输入采集       | [查看](plugins/pointer)    |
 | `@splicetree/plugin-selectable` | 选择（单/多/范围） | [查看](plugins/selectable) |

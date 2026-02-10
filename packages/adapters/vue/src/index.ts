@@ -3,8 +3,12 @@ import type { Ref, ShallowRef, WritableComputedRef } from 'vue'
 import { createSpliceTree } from '@splicetree/core'
 import { shallowRef, toValue, watch } from 'vue'
 
-export interface UseSpliceTreeReturn<T extends SpliceTreeData = SpliceTreeData> extends Omit<SpliceTreeInstance<T>, 'items'> {
+export interface UseSpliceTreeReturn<T extends SpliceTreeData = SpliceTreeData>
+  extends Omit<SpliceTreeInstance<T>, 'items' | 'selectedKeys'> {
   items: ShallowRef<SpliceTreeNode<T>[]>
+  selectedKeys: ShallowRef<string[]>
+  /** 原始 Set 引用（当启用 selectable 插件时存在） */
+  selectedKeysSet?: Set<string>
 }
 /**
  * Vue 3 适配器
@@ -18,12 +22,19 @@ export function useSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
 ): UseSpliceTreeReturn<T> {
   const api = shallowRef()
   const items = shallowRef<SpliceTreeNode<T>[]>(api.value?.items?.() ?? [])
+  const selectedKeys = shallowRef<string[]>([])
   const createTree = () => {
     api.value = createSpliceTree<T>(toValue(data), options)
     api.value.events.on('visibility', () => {
       items.value = api.value.items()
+      if (api.value?.selectedKeys instanceof Set) {
+        selectedKeys.value = Array.from(api.value.selectedKeys)
+      }
     })
     items.value = api.value.items()
+    if (api.value?.selectedKeys instanceof Set) {
+      selectedKeys.value = Array.from(api.value.selectedKeys)
+    }
   }
   createTree()
   watch(
@@ -33,7 +44,12 @@ export function useSpliceTree<T extends SpliceTreeData = SpliceTreeData>(
     },
     { deep: true, immediate: false },
   )
-  return { ...api.value, items }
+  return {
+    ...api.value,
+    items,
+    selectedKeys,
+    selectedKeysSet: api.value?.selectedKeys,
+  }
 }
 
 export type {
