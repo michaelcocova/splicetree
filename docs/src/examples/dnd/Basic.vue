@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useSpliceTree } from '@splicetree/adapter-vue'
-import dnd, { DropPosition } from '@splicetree/plugin-dnd'
+import dnd from '@splicetree/plugin-dnd'
 import { ChevronRight } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { cn } from '@/utils/shadcn'
-import { treeData } from './data'
+import { treeData } from '../data'
 
 const data = ref(treeData)
 

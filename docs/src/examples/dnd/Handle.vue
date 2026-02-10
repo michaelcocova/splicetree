@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useSpliceTree } from '@splicetree/adapter-vue'
 import dnd from '@splicetree/plugin-dnd'
-import { ChevronRight } from 'lucide-vue-next'
+import { ChevronRight, GripVertical } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { cn } from '@/utils/shadcn'
 import { treeData } from '../data'
@@ -10,7 +10,7 @@ const data = ref(treeData)
 
 const { items, dragProps, ghostStyle } = useSpliceTree(data, {
   plugins: [dnd],
-  configuration: { dnd: { readonly: true } },
+  configuration: { dnd: { handle: '.handle' } },
 })
 </script>
 
@@ -22,7 +22,8 @@ const { items, dragProps, ghostStyle } = useSpliceTree(data, {
         v-for="item in items" :key="item.id"
         :style="{ 'margin-left': `calc(var(--spacing) * 3 * ${item.level})` }"
         v-bind="dragProps(item.id)"
-        class="min-h-8 px-1 flex items-center gap-1 rounded relative opacity-50"
+        :data-id="item.id"
+        class="min-h-8 px-1 flex items-center gap-1 rounded relative dark:hover:bg-zinc-800 hover:bg-zinc-100"
       >
         <button
           :class="cn('ml-1 transition-all rounded-full size-5 flex items-center justify-center hover:bg-zinc-200', { 'opacity-0': !item.hasChildren() })"
@@ -30,7 +31,10 @@ const { items, dragProps, ghostStyle } = useSpliceTree(data, {
         >
           <ChevronRight :class="cn('size-3.5 transition-transform duration-200', { 'rotate-90': item.isExpanded() })" />
         </button>
-        <label>{{ item.original.title }}</label>
+        <label class="flex-1">{{ item.original.title }}</label>
+        <button class="handle ml-1 transition-all rounded size-5 flex items-center justify-center hover:bg-zinc-200" title="拖拽句柄">
+          <GripVertical class="size-4" />
+        </button>
       </div>
     </div>
   </div>

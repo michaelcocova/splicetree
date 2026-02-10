@@ -26,4 +26,8 @@ export interface DndOptions {
   autoExpandOnDrop?: boolean
   /** 全局只读，禁用所有拖拽与排序 */
   readonly?: boolean
+  /** 统一占位（ghost）指示颜色，默认 '#4224da' */
+  color?: string
+  /** 仅在匹配的句柄元素上允许拖拽（如 '.handle'） */
+  handle?: string
 }

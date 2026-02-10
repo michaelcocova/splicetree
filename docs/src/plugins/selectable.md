@@ -67,3 +67,20 @@ const tree = createSpliceTree(data, {
 
 - `isSelected()`：是否选中
 - `toggleSelect(on?)`：切换或显式设置选中
+
+## 在 Vue 3 适配器中使用选中集合（响应式）
+
+使用适配器时，选中集合将以 `ShallowRef<string[]>` 暴露，无需手动订阅事件：
+
+```ts
+import { useSpliceTree } from '@splicetree/adapter-vue'
+import selectable from '@splicetree/plugin-selectable'
+
+const tree = useSpliceTree(data, {
+  plugins: [selectable],
+  configuration: { selectable: { multiple: true } },
+})
+
+// 响应式选中集合
+const selected = tree.selectedKeys
+```

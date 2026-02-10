@@ -5,6 +5,7 @@ import checkable from '@splicetree/plugin-checkable'
 import dnd from '@splicetree/plugin-dnd'
 import keyboard from '@splicetree/plugin-keyboard'
 import pointer from '@splicetree/plugin-pointer'
+import search from '@splicetree/plugin-search'
 import selectable from '@splicetree/plugin-selectable'
 import { CheckSquare, ChevronRight, MinusSquare, Square } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
@@ -88,8 +89,8 @@ const treeData = ref<SpliceTreeData[]>([
   { id: 'cantaloupe-honey', title: 'Honey Cantaloupe', parent: 'cantaloupe' },
 ])
 
-const api = useSpliceTree(treeData, {
-  plugins: [dnd, pointer, keyboard, selectable, checkable],
+const { items, dragProps, onClick, search: searchTree, ghostStyle } = useSpliceTree(treeData, {
+  plugins: [dnd, pointer, keyboard, selectable, checkable, search],
   configuration: {
     autoExpandParent: true,
     defaultExpanded: ['strawberry-cream'],
@@ -108,11 +109,18 @@ const api = useSpliceTree(treeData, {
       autoExpandOnDrop: true,
       autoUpdateParent: true,
     },
+    search: {
+      method: (node: any, kw: string) =>
+        String(node.original.title ?? '').toLowerCase().includes(kw.toLowerCase()),
+    },
   },
 })
-const { items, dragProps, onClick, ghostStyle } = api
 
 const keyboardRoot = ref<HTMLElement | null>(null)
+const keyword = ref('')
+function doSearch() {
+  searchTree(keyword.value)
+}
 
 onMounted(() => {
   keyboardRoot.value?.focus()
@@ -125,6 +133,12 @@ onMounted(() => {
       <header class="py-3 font-semibold">
         交互式树 · 拖拽排序 · 勾选多选 · 键盘导航
       </header>
+      <div class="flex items-center gap-2 mb-2">
+        <input v-model="keyword" class="border rounded px-2 py-1" placeholder="输入关键字">
+        <button class="border rounded px-2 py-1" @click="doSearch">
+          搜索
+        </button>
+      </div>
       <section
         ref="keyboardRoot"
         tabindex="0"

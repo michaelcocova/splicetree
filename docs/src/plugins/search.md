@@ -10,13 +10,13 @@
 
 ```ts
 import { createSpliceTree } from '@splicetree/core'
-import { search } from '@splicetree/search'
+import search from '@splicetree/plugin-search'
 
 const tree = createSpliceTree(data, {
   plugins: [search],
   configuration: {
     search: {
-      matcher: (node, q) => String(node.original.title ?? '').toLowerCase().includes(q.toLowerCase()),
+      method: (node, keyword) => String(node.original.title ?? '').toLowerCase().includes(keyword.toLowerCase()),
     },
   },
 })
@@ -26,21 +26,17 @@ tree.search('readme')
 
 ## 示例
 
-### 基本搜索
+### 基本树搜索
 
 <demo vue="../examples/search/BasicSearch.vue" />
-
-### 自定义匹配器
-
-<demo vue="../examples/search/CustomMatcher.vue" />
 
 ## Api
 
 ### Configuration
 
-| 选项                           | 类型                                               | 默认值                                     | 说明         |
-| ------------------------------ | -------------------------------------------------- | ------------------------------------------ | ------------ |
-| `configuration.search.matcher` | `(node: SpliceTreeNode, query: string) => boolean` | `JSON.stringify(original).includes(query)` | 自定义匹配器 |
+| 选项                          | 类型                                                 | 默认值 | 说明                   |
+| ----------------------------- | ---------------------------------------------------- | ------ | ---------------------- |
+| `configuration.search.method` | `(node: SpliceTreeNode, keyword: string) => boolean` | `无`   | 自定义匹配方法（必填） |
 
 ### Events
 
@@ -50,14 +46,9 @@ tree.search('readme')
 
 ### 实例方法
 
-| 名称            | 参数            | 说明         |
-| --------------- | --------------- | ------------ |
-| `matchedKeys`   | `无`            | 匹配集合     |
-| `isMatched(id)` | `id: string`    | 节点是否匹配 |
-| `search(query)` | `query: string` | 执行搜索     |
+| 名称            | 参数            | 说明                                                                   |
+| --------------- | --------------- | ---------------------------------------------------------------------- |
+| `matchedKeys`   | `无`            | 匹配集合（可用于自定义渲染逻辑）                                       |
+| `search(query)` | `query: string` | 执行搜索（树搜索：展开命中的祖先链；未提供匹配方法时不执行并打印警告） |
 
-### 节点方法
-
-| 名称          | 参数 | 说明             |
-| ------------- | ---- | ---------------- |
-| `isMatched()` | `无` | 当前节点是否匹配 |
+（节点不再扩展 isMatched 方法）

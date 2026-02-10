@@ -1,6 +1,37 @@
 # Changelog
 
 
+## v2.0.0 – 2026-02-10
+
+### @splicetree/plugin-dnd – 2.0.0
+
+### Minor Changes
+
+- 拖拽插件增强：
+  - 新增 `configuration.dnd.handle`：仅在指定句柄元素上允许拖拽（如 `.handle`）；未设置时整个节点可拖拽
+  - 新增 `configuration.dnd.color`：统一占位（ghost）颜色配置
+
+### @splicetree/plugin-search – 2.0.0
+
+### Major Changes
+
+- 搜索插件增强为“树搜索”，并统一到新的 API：
+  - 新增配置项 `configuration.search.method(node, keyword)`（必填）
+  - 搜索时展开所有命中节点的祖先链，清晰展示匹配路径；清空搜索时恢复此前的展开状态。
+  - 移除 `isMatched`（实例与节点扩展），以过滤后的 `items` 与 `matchedKeys` 驱动渲染
+  - 未提供 `method` 时不执行搜索并打印警告
+
+### @splicetree/adapter-vue – 2.0.0
+
+### Minor Changes
+
+- Vue 适配器增强：暴露 `selectedKeys` 为响应式 `ShallowRef<string[]>`，并保留原始 `Set` 于 `selectedKeysSet`。
+  - 监听核心的 `visibility` 事件，同步 `items` 与 `selectedKeys`。
+  - 无需在应用层手动订阅事件更新选择集合。
+  - 向后兼容：原有插件的 `selectedKeys: Set<string>` 仍可通过 `selectedKeysSet` 访问。
+
+---
+
 ## v1.0.0 – 2026-01-07
 
 ### @splicetree/core – 1.0.0
